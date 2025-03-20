@@ -184,11 +184,11 @@ def requests():
         flash("You are not authorized to view this page.")
         return url_for('shifts')
     requests = TimeOffRequest.query.all()
-    return render_template('view_time_off_requests.html', requests=requests)
+    return render_template('requests.html', requests=requests)
 
 @app.route('/view_time_off_request', methods=['GET', 'POST'])
 @login_required
-def view_time_request():
+def view_time_off_request():
     if current_user.role != 'manager':
         flash("You are not authorized to view this page.")
         return url_for('shifts')
