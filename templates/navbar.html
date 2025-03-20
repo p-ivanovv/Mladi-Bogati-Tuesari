@@ -6,7 +6,7 @@
                 <div class="collapse navbar-collapse" id="navcol-1">
                     {% if current_user.is_authenticated %}
                         <ul class="nav navbar-nav">
-                            <button onclick="window.location.href='home.html'">Home</button>
+                            <a href="{{url_for('home2')}}"><button>Home</button></a>
                             <button onclick="window.location.href='profile.html'">Profile</button>
                             <button onclick="window.location.href='plan.html'">Plan</button>
                             <button onclick="window.location.href='logout.html'">Logout</button>
