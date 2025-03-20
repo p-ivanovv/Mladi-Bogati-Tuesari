@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
 from flask import request, flash, redirect, url_for, session
 from webforms import LoginForm, UserForm
+from datetime import datetime, timedelta
 
 
 app = Flask(__name__)
@@ -159,6 +160,11 @@ def register():
 def dashboard():
     return render_template('dashboard.html')
 
+@app.route('/plan')
+@login_required
+def plan():
+    return render_template('plan.html')
+
 @app.route('/request_time_off', methods=['GET', 'POST'])
 @login_required
 def request_time_off():
@@ -258,7 +264,9 @@ def add_shift():
             flash("All fields are required!")
     users = Users.query.all()
     shifts = Shifts.query.all()
-    return render_template('add_shift.html', users=users, shifts=shifts)
+    today = datetime.now()
+    calendar_days = [today + timedelta(days=i) for i in range(7)]  # Generate the next 7 days
+    return render_template('add_shift.html', users=users, shifts=shifts, calendar_days=calendar_days)
 
 @app.route('/shift/edit/<int:shift_id>', methods=['GET', 'POST'])
 @login_required

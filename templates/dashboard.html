@@ -49,6 +49,9 @@
     <a href="{{ url_for('delete', id=current_user.id)}}" class="btn btn-danger btn-sm">Delete</a>
     <br/><br/>
 
+    {% if current_user.role == 'manager' %}
+        <a href="{{ url_for('add_shift') }}" class="btn btn-primary">Assign Shifts</a>
+    {% endif %}
     
 	</div>
 	</div>
