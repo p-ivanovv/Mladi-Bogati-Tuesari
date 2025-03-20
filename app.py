@@ -259,6 +259,11 @@ def add_shift():
             flash("All fields are required!")
     users = Users.query.all()
     shifts = Shifts.query.all()
+
+    # Convert shift dates to datetime objects for proper comparison
+    for shift in shifts:
+        shift.date = datetime.strptime(shift.date, '%Y-%m-%d')
+
     today = datetime.now()
     calendar_days = [today + timedelta(days=i) for i in range(7)]  # Generate the next 7 days
     return render_template('add_shift.html', users=users, shifts=shifts, calendar_days=calendar_days)
