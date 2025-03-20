@@ -109,7 +109,7 @@ def register():
 		form.role.data = ''
 
 		flash("User Added Successfully")
-	return render_template("add_user.html", 
+	return render_template("register.html", 
 		form=form,
 		name=name)
 
