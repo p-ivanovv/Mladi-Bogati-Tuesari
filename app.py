@@ -115,7 +115,7 @@ def register():
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('startingpage.html')
 
 @app.route('/calendar-data')
 def calendar_data():
