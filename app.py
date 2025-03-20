@@ -19,7 +19,7 @@ class Users(db.Model, UserMixin):
     name = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
     password_hash = db.Column(db.String(128))
-    role = db.Column(db.String(20), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default='employee')
 
     @property
     def password(self):
@@ -92,26 +92,25 @@ def logout():
 
 @app.route('/user/add', methods=['GET', 'POST'])
 def register():
-	name = None
-	form = UserForm()
-	if form.validate_on_submit():
-		user = Users.query.filter_by(email=form.email.data).first()
-		if user is None:
-			hashed_pw = generate_password_hash(form.password_hash.data)
-			user = Users(username=form.username.data, name=form.name.data, email=form.email.data, password_hash=hashed_pw, role=form.role.data)
-			db.session.add(user)
-			db.session.commit()
-		name = form.name.data
-		form.name.data = ''
-		form.username.data = ''
-		form.email.data = ''
-		form.password_hash.data = ''
-		form.role.data = ''
+    name = None
+    form = UserForm()
+    if form.validate_on_submit():  
+        user = Users.query.filter_by(email=form.email.data).first()
+        if user is None:  
+            hashed_pw = generate_password_hash(form.password_hash.data)
+            user = Users(
+                username=form.username.data,
+                name=form.name.data,
+                email=form.email.data,
+                password_hash=hashed_pw,
+                role=form.role.data
+            )
+            db.session.add(user)  
+            db.session.commit()  
+            flash("User Added Successfully")
+            return redirect(url_for('login')) 
 
-		flash("User Added Successfully")
-	return render_template("register.html", 
-		form=form,
-		name=name)
+    return render_template("register.html", form=form, name=name)
 
 @app.route('/dashboard')
 @login_required
@@ -121,21 +120,33 @@ def dashboard():
 @app.route('/request_time_off', methods=['GET', 'POST'])
 @login_required
 def request_time_off():
-
-    return render_template('request_time_off.html')
+    if request.method == 'POST':
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        reason = request.form.get('reason')
+        if start_date and end_date and reason:
+            new_request = TimeOffRequest(user_id=current_user.id, start_date=start_date, end_date=end_date, reason=reason)
+            db.session.add(new_request)
+            db.session.commit()
+            flash("Request submitted successfully!")
+        else:
+            flash("All fields are required!")
+    requests = TimeOffRequest.query.filter_by(user_id=current_user.id).all()
+    return render_template('request_time_off.html', requests=requests)
+    #return render_template('request_time_off.html')
 
 @app.route('/requests', methods=['GET', 'POST'])
 @login_required
 def view_time_off_requests():
-    if current_user.role == 'manager':
+    if current_user.role != 'manager':
         flash("You are not authorized to view this page.")
         return url_for('shifts')
     return render_template('view_time_off_requests.html')
 
 @app.route('/view_time_off_request', methods=['GET', 'POST'])
 @login_required
-def view_time_off_request():
-    if current_user.role == 'manager':
+def view_time_():
+    if current_user.role != 'manager':
         flash("You are not authorized to view this page.")
         return url_for('shifts')
     return render_template('view_time_off_request.html')
@@ -169,7 +180,7 @@ def add_shift(user_id):
     shifts = Shifts.query.filter_by(user_id=user_id).all()
     return render_template('plan_all.html', shifts=shifts)
 
-    return render_template('startingpage.html')
+    #return render_template('startingpage.html')
   
 if __name__ == '__main__':
     app.run(debug=True)
