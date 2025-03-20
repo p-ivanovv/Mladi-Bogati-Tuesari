@@ -237,25 +237,35 @@ def calendar_data_all():
         flash("Please log in to access this page.")
         return redirect(url_for('login'))
 
-@app.route('/shift/add/<int:user_id>', methods=['GET', 'POST'])
-def add_shift(user_id):
+@app.route('/shift/add', methods=['GET', 'POST'])
+@login_required
+def add_shift():
+    if current_user.role != 'manager':
+        flash("Access Denied: Only managers can add shifts.")
+        return redirect(url_for('home'))
     if request.method == 'POST':
         date = request.form.get('date')
         start_time = request.form.get('start_time')
         end_time = request.form.get('end_time')
-        if date and start_time and end_time:
+        user_id = request.form.get('user_id')
+        if date and start_time and end_time and user_id:
             new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id)
             db.session.add(new_shift)
             db.session.commit()
             flash("Shift added successfully!")
+            return redirect(url_for('add_shift'))
         else:
             flash("All fields are required!")
-    shifts = Shifts.query.filter_by(user_id=user_id).all()
-    return render_template('plan_all.html', shifts=shifts)
+    users = Users.query.all()
+    shifts = Shifts.query.all()
+    return render_template('add_shift.html', users=users, shifts=shifts)
 
 @app.route('/shift/edit/<int:shift_id>', methods=['GET', 'POST'])
 @login_required
 def edit_shift(shift_id):
+    if current_user.role != 'manager':
+        flash("Access Denied: Only managers can edit shifts.")
+        return redirect(url_for('home'))
     shift = Shifts.query.get_or_404(shift_id)
     if request.method == 'POST':
         shift.date = request.form.get('date')
@@ -272,6 +282,9 @@ def edit_shift(shift_id):
 @app.route('/shift/delete/<int:shift_id>', methods=['POST'])
 @login_required
 def delete_shift(shift_id):
+    if current_user.role != 'manager':
+        flash("Access Denied: Only managers can delete shifts.")
+        return redirect(url_for('home'))
     shift = Shifts.query.get_or_404(shift_id)
     db.session.delete(shift)
     db.session.commit()

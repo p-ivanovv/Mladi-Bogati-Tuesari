@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Shift</title>
+</head>
+<body>
+    <h1>Add Shift</h1>
+    <form method="POST" action="{{ url_for('add_shift') }}">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required><br>
+        <label for="start_time">Start Time:</label>
+        <input type="time" id="start_time" name="start_time" required><br>
+        <label for="end_time">End Time:</label>
+        <input type="time" id="end_time" name="end_time" required><br>
+        <label for="user_id">Assign to User:</label>
+        <select id="user_id" name="user_id" required>
+            {% for user in users %}
+                <option value="{{ user.id }}">{{ user.name }}</option>
+            {% endfor %}
+        </select><br>
+        <button type="submit">Add Shift</button>
+    </form>
+
+    <h2>Current Shifts</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Shift ID</th>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Assigned User</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for shift in shifts %}
+                <tr>
+                    <td>{{ shift.id }}</td>
+                    <td>{{ shift.date }}</td>
+                    <td>{{ shift.start_time }}</td>
+                    <td>{{ shift.end_time }}</td>
+                    <td>{{ shift.user.name }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
