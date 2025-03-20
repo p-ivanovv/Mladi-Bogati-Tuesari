@@ -211,6 +211,12 @@ def view_time_off_request():
 def home():
     return render_template('startingpage.html')
 
+@app.route('/home')
+@login_required
+def home2():
+    return render_template('home.html')
+
+
 @app.route('/calendar-data')
 @login_required
 def calendar_data():
@@ -276,10 +282,24 @@ def edit_shift(shift_id):
         return redirect(url_for('home'))
     shift = Shifts.query.get_or_404(shift_id)
     if request.method == 'POST':
-        shift.date = request.form.get('date')
-        shift.start_time = request.form.get('start_time')
-        shift.end_time = request.form.get('end_time')
-        if shift.date and shift.start_time and shift.end_time:
+        new_date = request.form.get('date')
+        new_start_time = request.form.get('start_time')
+        new_end_time = request.form.get('end_time')
+        user_id = shift.user_id  # Keep the same user ID
+
+        if new_date and new_start_time and new_end_time:
+            # Delete the old shift
+            db.session.delete(shift)
+            db.session.commit()
+
+            # Create a new shift with the updated details
+            new_shift = Shifts(
+                date=new_date,
+                start_time=new_start_time,
+                end_time=new_end_time,
+                user_id=user_id
+            )
+            db.session.add(new_shift)
             db.session.commit()
             flash("Shift updated successfully!")
             return redirect(url_for('calendar_data_all'))

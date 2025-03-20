@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Shift</title>
+    <title>Shift Manager</title>
     <style>
-        /* Стил за модалния прозорец */
         .modal {
-            display: none; /* Скриваме по подразбиране */
+            display: none;
             position: fixed;
             z-index: 1;
             left: 0;
@@ -16,7 +15,6 @@
             height: 100%;
             background-color: rgba(0,0,0,0.5);
         }
-
         .modal-content {
             background-color: white;
             margin: 15% auto;
@@ -26,13 +24,11 @@
             border-radius: 10px;
             text-align: center;
         }
-
         .close {
             float: right;
             font-size: 28px;
             cursor: pointer;
         }
-
         .calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -52,21 +48,19 @@
             border: 1px solid #bee5eb;
             border-radius: 5px;
             font-size: 0.9em;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <h1>Shift Manager</h1>
-
-    <!-- Бутон за отваряне на pop-up -->
     <button id="openModal">Add Shift</button>
-
-    <!-- Pop-up модал -->
     <div id="shiftModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Add Shift</h2>
-            <form method="POST" action="{{ url_for('add_shift') }}">
+            <h2 id="modalTitle">Add Shift</h2>
+            <form id="shiftForm" method="POST" action="{{ url_for('add_shift') }}">
+                <input type="hidden" id="shift_id" name="shift_id">
                 <label for="date">Date:</label>
                 <input type="date" id="date" name="date" required><br>
                 <label for="start_time">Start Time:</label>
@@ -79,11 +73,13 @@
                         <option value="{{ user.id }}">{{ user.name }}</option>
                     {% endfor %}
                 </select><br>
-                <button type="submit">Add Shift</button>
+                <button type="submit" id="submitButton">Save Shift</button>
+                {% if is_manager %}
+                    <button type="button" id="deleteButton" style="background-color: red; color: white; display: none;">Delete Shift</button>
+                {% endif %}
             </form>
         </div>
     </div>
-
     <h2>Shift Calendar</h2>
     <div class="calendar">
         {% for day in calendar_days %}
@@ -91,7 +87,7 @@
                 <strong>{{ day.strftime('%A, %d %B') }}</strong>
                 {% for shift in shifts %}
                     {% if shift.date.date() == day.date() %}
-                        <div class="shift">
+                        <div class="shift" data-id="{{ shift.id }}" data-date="{{ shift.date }}" data-start="{{ shift.start_time }}" data-end="{{ shift.end_time }}" data-user="{{ shift.user.id }}">
                             <strong>{{ shift.user.name }}</strong><br>
                             {{ shift.start_time }} - {{ shift.end_time }}
                         </div>
@@ -100,29 +96,61 @@
             </div>
         {% endfor %}
     </div>
-
     <script>
-        // Намираме елементите
         var modal = document.getElementById("shiftModal");
         var btn = document.getElementById("openModal");
         var span = document.getElementsByClassName("close")[0];
-
-        // При кликване върху бутона се отваря pop-up
+        var form = document.getElementById("shiftForm");
+        var shiftIdInput = document.getElementById("shift_id");
+        var dateInput = document.getElementById("date");
+        var startTimeInput = document.getElementById("start_time");
+        var endTimeInput = document.getElementById("end_time");
+        var userSelect = document.getElementById("user_id");
+        var modalTitle = document.getElementById("modalTitle");
+        var submitButton = document.getElementById("submitButton");
+        var deleteButton = document.getElementById("deleteButton");
+        
         btn.onclick = function() {
             modal.style.display = "block";
+            modalTitle.innerText = "Add Shift";
+            shiftIdInput.value = "";
+            dateInput.value = "";
+            startTimeInput.value = "";
+            endTimeInput.value = "";
+            userSelect.value = "";
+            deleteButton.style.display = "none";
         }
-
-        // При кликване на "X" се затваря pop-up
+        
         span.onclick = function() {
             modal.style.display = "none";
         }
-
-        // Затваряне на pop-up при кликване извън него
+        
         window.onclick = function(event) {
             if (event.target == modal) {
                 modal.style.display = "none";
             }
         }
+        
+        document.querySelectorAll(".shift").forEach(shift => {
+            shift.addEventListener("click", function() {
+                modal.style.display = "block";
+                modalTitle.innerText = "Edit Shift";
+                shiftIdInput.value = this.getAttribute("data-id");
+                dateInput.value = this.getAttribute("data-date");
+                startTimeInput.value = this.getAttribute("data-start");
+                endTimeInput.value = this.getAttribute("data-end");
+                userSelect.value = this.getAttribute("data-user");
+                if (isManager) { // isManager should be defined in your script
+                    deleteButton.style.display = "inline-block";
+                        deleteButton.onclick = function () {
+                    if (confirm("Are you sure you want to delete this shift?")) {
+                    window.location.href = `/shift/delete/${shiftIdInput.value}`;
+        }
+    };
+}
+
+            });
+        });
     </script>
 </body>
 </html>
