@@ -260,6 +260,15 @@ def add_shift():
         user_id = request.form.get('user_id')
 
         if date and start_time and end_time and user_id:
+            shift_year = datetime.strptime(date, '%Y-%m-%d').year
+            if shift_year != 2025:
+                flash("The year must be 2025.")
+                return redirect(url_for('add_shift'))
+
+            if start_time >= end_time:
+                flash("Start time must be earlier than end time.")
+                return redirect(url_for('add_shift'))
+
             overlapping_shifts = Shifts.query.filter(
                 Shifts.user_id == user_id,
                 Shifts.date == date,
@@ -274,6 +283,7 @@ def add_shift():
                 flash("Shift overlaps with an existing shift for this employee.")
                 return redirect(url_for('add_shift'))
 
+            # Add the new shift
             new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id)
             db.session.add(new_shift)
             db.session.commit()
