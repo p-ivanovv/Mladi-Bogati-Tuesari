@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required
+from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
 from flask import request, flash, redirect, url_for, session
 from webforms import LoginForm, UserForm
 
@@ -98,7 +98,7 @@ def register():
 		user = Users.query.filter_by(email=form.email.data).first()
 		if user is None:
 			hashed_pw = generate_password_hash(form.password_hash.data)
-			user = Users(username=form.username.data, name=form.name.data, email=form.email.data, password_hash=hashed_pw)
+			user = Users(username=form.username.data, name=form.name.data, email=form.email.data, password_hash=hashed_pw, role=form.role.data)
 			db.session.add(user)
 			db.session.commit()
 		name = form.name.data
@@ -112,6 +112,33 @@ def register():
 	return render_template("register.html", 
 		form=form,
 		name=name)
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
+
+@app.route('/request_time_off', methods=['GET', 'POST'])
+@login_required
+def request_time_off():
+
+    return render_template('request_time_off.html')
+
+@app.route('/requests', methods=['GET', 'POST'])
+@login_required
+def view_time_off_requests():
+    if current_user.role == 'manager':
+        flash("You are not authorized to view this page.")
+        return url_for('shifts')
+    return render_template('view_time_off_requests.html')
+
+@app.route('/view_time_off_request', methods=['GET', 'POST'])
+@login_required
+def view_time_off_request():
+    if current_user.role == 'manager':
+        flash("You are not authorized to view this page.")
+        return url_for('shifts')
+    return render_template('view_time_off_request.html')
 
 @app.route('/')
 def home():
