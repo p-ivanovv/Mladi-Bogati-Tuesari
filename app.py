@@ -55,6 +55,13 @@ class TimeOffRequest(db.Model):
     reason = db.Column(db.String(200))
     status = db.Column(db.String(20), default='Pending')
 
+class Company(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False, unique=True)
+    manager_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    work_on_weekends = db.Column(db.Boolean, default=False)
+    employees = db.relationship('Users', backref='company', lazy=True)
+
 with app.app_context():
 	db.create_all()
 
@@ -155,10 +162,28 @@ def register():
 
     return render_template("register.html", form=form, name=name)
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    company = None
+    if current_user.role == 'manager':
+        company = Company.query.filter_by(manager_id=current_user.id).first()
+        if request.method == 'POST':
+            company_name = request.form.get('company_name')
+            work_on_weekends = request.form.get('work_on_weekends') == 'on'
+            if company_name:
+                new_company = Company(
+                    name=company_name,
+                    manager_id=current_user.id,
+                    work_on_weekends=work_on_weekends
+                )
+                db.session.add(new_company)
+                db.session.commit()
+                flash("Company created successfully!")
+                return redirect(url_for('dashboard'))
+    elif current_user.role == 'employee':
+        company = current_user.company
+    return render_template('dashboard.html', company=company)
 
 @app.route('/request_time_off', methods=['GET', 'POST'])
 @login_required

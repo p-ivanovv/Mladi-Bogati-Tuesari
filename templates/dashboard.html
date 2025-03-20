@@ -1,72 +1,61 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 {% for message in get_flashed_messages() %}
-	
-	<div class="alert alert-warning alert-dismissible fade show" role="alert">
-	  {{ message }}
-	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-	</div>
-
-	
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 {% endfor %}
 
-
-
-	<h2>Dashboard</h2>
-	<br/>
-
-	<div class="card">
-  <div class="card-header">
-    {{ current_user.name }}
-  </div>
-  <div class="card-body">
-   
-    <p class="card-text">
-
-<div class="container">
-	<div class="row">
-		<div class="col-8">
-
-    <strong>Name:</strong>
-	{{ current_user.name }}<br/>
-
-	<strong>Username:</strong>
-	{{ current_user.username }}<br/>
-
-	<strong>User Id:</strong>
-	{{ current_user.id }}<br/>
-
-	<strong>Email:</strong>
-	{{ current_user.email }}<br/>
-
-    </p>
-    <a href="{{ url_for('logout')}}" class="btn btn-secondary btn-sm">Logout</a>
-
-    <a href="{{ url_for('update', id=current_user.id)}}" class="btn btn-secondary btn-sm">Update Profile</a>
-
-    <a href="{{ url_for('delete', id=current_user.id)}}" class="btn btn-danger btn-sm">Delete</a>
-    <br/><br/>
-
-    {% if current_user.role == 'manager' %}
-        <a href="{{ url_for('add_shift') }}" class="btn btn-primary">Assign Shifts</a>
-    {% endif %}
-    
-	</div>
-	</div>
-	</div>
-
-
-  </div>
-</div>
-	
-
-	
+<h2>Dashboard</h2>
 <br/>
-        </form>
+
+<div class="card">
+    <div class="card-header">
+        User Details
+    </div>
+    <div class="card-body">
+        <p><strong>Name:</strong> {{ current_user.name }}</p>
+        <p><strong>Username:</strong> {{ current_user.username }}</p>
+        <p><strong>User ID:</strong> {{ current_user.id }}</p>
+        {% if current_user.role == 'manager' %}
+            <p><strong>Role:</strong> Manager</p>
+            {% if company %}
+                <p><strong>Company:</strong> {{ company.name }}</p>
+            {% else %}
+                <p><strong>Company:</strong> None</p>
+            {% endif %}
+        {% elif current_user.role == 'employee' %}
+            <p><strong>Role:</strong> Employee</p>
+            {% if current_user.company %}
+                <p><strong>Company:</strong> {{ current_user.company.name }}</p>
+            {% else %}
+                <p><strong>Company:</strong> None</p>
+            {% endif %}
+        {% endif %}
     </div>
 </div>
 
+{% if current_user.role == 'manager' and not company %}
+    <div class="card mt-4">
+        <div class="card-header">
+            Create a Company
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="company_name" class="form-label">Company Name</label>
+                    <input type="text" id="company_name" name="company_name" class="form-control" required>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="work_on_weekends" name="work_on_weekends" class="form-check-input">
+                    <label for="work_on_weekends" class="form-check-label">Work on Weekends</label>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Create Company</button>
+            </form>
+        </div>
+    </div>
+{% endif %}
 
 {% endblock %}
