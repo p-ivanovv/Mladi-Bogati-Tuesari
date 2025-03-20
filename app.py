@@ -107,7 +107,6 @@ def register():
 		form.email.data = ''
 		form.password_hash.data = ''
 		form.role.data = ''
-
 		flash("User Added Successfully")
 	return render_template("register.html", 
 		form=form,
@@ -118,13 +117,31 @@ def home():
     return render_template('home.html')
 
 @app.route('/calendar-data')
+@login_required
 def calendar_data():
-    return render_template('plan.html')
+    if session.get('username'):
+        user = Users.query.filter_by(username=session['username']).first()
+        if user.role == 'Employee':
+            shifts = Shifts.query.filter_by(user_id=user.id).all()
+            return render_template('plan.html', shifts=shifts)
+    else:
+        flash("Please log in to access this page.")
+        return redirect(url_for('login'))
 
 @app.route('/calendar-data-all')
+@login_required
 def calendar_data_all():
-    shifts = Shifts.query.all()
-    return render_template('plan_all.html', shifts=shifts)
+    if session.get('username'):
+        user = Users.query.filter_by(username=session['username']).first()
+        if user.role == 'Manager':
+            shifts = Shifts.query.all()
+            return render_template('plan_all.html', shifts=shifts)
+        else:
+            flash("Access Denied: Only managers can view this page.")
+            return redirect(url_for('home'))
+    else:
+        flash("Please log in to access this page.")
+        return redirect(url_for('login'))
 
 @app.route('/shift/add/<int:user_id>', methods=['GET', 'POST'])
 def add_shift(user_id):
@@ -142,7 +159,30 @@ def add_shift(user_id):
     shifts = Shifts.query.filter_by(user_id=user_id).all()
     return render_template('plan_all.html', shifts=shifts)
 
-    return render_template('startingpage.html')
-  
+@app.route('/shift/edit/<int:shift_id>', methods=['GET', 'POST'])
+@login_required
+def edit_shift(shift_id):
+    shift = Shifts.query.get_or_404(shift_id)
+    if request.method == 'POST':
+        shift.date = request.form.get('date')
+        shift.start_time = request.form.get('start_time')
+        shift.end_time = request.form.get('end_time')
+        if shift.date and shift.start_time and shift.end_time:
+            db.session.commit()
+            flash("Shift updated successfully!")
+            return redirect(url_for('calendar_data_all'))
+        else:
+            flash("All fields are required!")
+    return render_template('edit_shift.html', shift=shift)
+
+@app.route('/shift/delete/<int:shift_id>', methods=['POST'])
+@login_required
+def delete_shift(shift_id):
+    shift = Shifts.query.get_or_404(shift_id)
+    db.session.delete(shift)
+    db.session.commit()
+    flash("Shift deleted successfully!")
+    return redirect(url_for('calendar_data_all'))
+
 if __name__ == '__main__':
     app.run(debug=True)
