@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            text-align: center;
+            padding: 10px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        td {
+            height: 50px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    
+    <h1>Weekly Calendar</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+                <th>Saturday</th>
+                <th>Sunday</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Generate rows for each hour from 00:00 to 23:00 -->
+            <tr>
+                <td>00:00</td>
+                <td onclick="addTask(this)"></td>
+                <td onclick="addTask(this)"></td>
+                <td onclick="addTask(this)"></td>
+                <td onclick="addTask(this)"></td>
+                <td onclick="addTask(this)"></td>
+                <td onclick="addTask(this)"></td>
+                <td onclick="addTask(this)"></td>
+            </tr>
+            <!-- Repeat the above <tr> block for each hour -->
+            <tr>
+                <td>23:00</td>
+                <td onclick="addTask(this)"></td>
+                <td onclick="addTask(this)"></td>
+                <td onclick="addTask(this)"></td>
+                <td onclick="addTask(this)"></td>
+                <td onclick="addTask(this)"></td>
+                <td onclick="addTask(this)"></td>
+                <td onclick="addTask(this)"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function addTask(cell) {
+            const task = prompt("Enter your task:");
+            if (task) {
+                cell.innerHTML = task;
+            }
+        }
+    </script>
+</body>
+</html>
