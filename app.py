@@ -90,6 +90,48 @@ def logout():
 	flash("You Have Been Logged Out")
 	return redirect(url_for('login'))
 
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+@login_required
+def update(id):
+	form = UserForm()
+	name_to_update = Users.query.get_or_404(id)
+	if request.method == "POST":
+		name_to_update.name = request.form['name']
+		name_to_update.email = request.form['email']
+		name_to_update.username = request.form['username']
+		try:
+			db.session.commit()
+			flash("User Updated Successfully!")
+			return render_template("update.html", form=form, name_to_update = name_to_update, id=id)
+		except:
+			flash("Error. Looks like there was a problem - try again.")
+			return render_template("update.html", form=form, name_to_update = name_to_update, id=id)
+	else:
+		return render_template("update.html", form=form, name_to_update = name_to_update, id = id)
+
+@app.route('/delete/<int:id>')
+@login_required
+def delete(id):
+	if id == current_user.id:
+		user_to_delete = Users.query.get_or_404(id)
+		name = None
+		form = UserForm()
+
+		try:
+			db.session.delete(user_to_delete)
+			db.session.commit()
+			flash("User Deleted Successfully!!")
+
+			our_users = Users.query.order_by(Users.date_added)
+			return render_template("add_user.html", form=form, name=name, our_users=our_users)
+
+		except:
+			flash("There was a problem deleting user - try again.")
+			return render_template("add_user.html", form=form, name=name,our_users=our_users)
+	else:
+		flash("Sorry, you can't delete that user! ")
+		return redirect(url_for('dashboard'))
+
 @app.route('/user/add', methods=['GET', 'POST'])
 def register():
     name = None
@@ -117,6 +159,11 @@ def register():
 def dashboard():
     return render_template('dashboard.html')
 
+@app.route('/plan')
+@login_required
+def plan():
+    return render_template('plan.html')
+
 @app.route('/request_time_off', methods=['GET', 'POST'])
 @login_required
 def request_time_off():
@@ -137,19 +184,32 @@ def request_time_off():
 
 @app.route('/requests', methods=['GET', 'POST'])
 @login_required
-def view_time_off_requests():
+def requests():
     if current_user.role != 'manager':
         flash("You are not authorized to view this page.")
         return url_for('shifts')
-    return render_template('view_time_off_requests.html')
+    requests = TimeOffRequest.query.all()
+    return render_template('requests.html', requests=requests)
 
 @app.route('/view_time_off_request', methods=['GET', 'POST'])
 @login_required
-def view_time_():
+def view_time_off_request():
     if current_user.role != 'manager':
         flash("You are not authorized to view this page.")
         return url_for('shifts')
-    return render_template('view_time_off_request.html')
+    if request.method == 'POST':
+        request_id = request.form.get('request_id')
+        action = request.form.get('action')
+        request = TimeOffRequest.query.get(request_id)
+        if action == 'approve':
+            request.status = 'Approved'
+        elif action == 'reject':
+            request.status = 'Rejected'
+
+        db.session.commit()
+        flash("Request updated successfully!")
+        return url_for('requests')
+    return render_template('view_time_off_request.html', requests=requests)
 
 @app.route('/')
 def home():
@@ -182,25 +242,35 @@ def calendar_data_all():
         flash("Please log in to access this page.")
         return redirect(url_for('login'))
 
-@app.route('/shift/add/<int:user_id>', methods=['GET', 'POST'])
-def add_shift(user_id):
+@app.route('/shift/add', methods=['GET', 'POST'])
+@login_required
+def add_shift():
+    if current_user.role != 'manager':
+        flash("Access Denied: Only managers can add shifts.")
+        return redirect(url_for('home'))
     if request.method == 'POST':
         date = request.form.get('date')
         start_time = request.form.get('start_time')
         end_time = request.form.get('end_time')
-        if date and start_time and end_time:
+        user_id = request.form.get('user_id')
+        if date and start_time and end_time and user_id:
             new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id)
             db.session.add(new_shift)
             db.session.commit()
             flash("Shift added successfully!")
+            return redirect(url_for('add_shift'))
         else:
             flash("All fields are required!")
-    shifts = Shifts.query.filter_by(user_id=user_id).all()
-    return render_template('plan_all.html', shifts=shifts)
+    users = Users.query.all()
+    shifts = Shifts.query.all()
+    return render_template('add_shift.html', users=users, shifts=shifts)
 
 @app.route('/shift/edit/<int:shift_id>', methods=['GET', 'POST'])
 @login_required
 def edit_shift(shift_id):
+    if current_user.role != 'manager':
+        flash("Access Denied: Only managers can edit shifts.")
+        return redirect(url_for('home'))
     shift = Shifts.query.get_or_404(shift_id)
     if request.method == 'POST':
         shift.date = request.form.get('date')
@@ -217,6 +287,9 @@ def edit_shift(shift_id):
 @app.route('/shift/delete/<int:shift_id>', methods=['POST'])
 @login_required
 def delete_shift(shift_id):
+    if current_user.role != 'manager':
+        flash("Access Denied: Only managers can delete shifts.")
+        return redirect(url_for('home'))
     shift = Shifts.query.get_or_404(shift_id)
     db.session.delete(shift)
     db.session.commit()
