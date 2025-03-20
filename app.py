@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -56,7 +56,7 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    return "Welcome to the Flask App!"
+    return render_template('home.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
