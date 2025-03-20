@@ -4,53 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shift Manager</title>
-    <style>
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal-content {
-            background-color: white;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .close {
-            float: right;
-            font-size: 28px;
-            cursor: pointer;
-        }
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .day {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: center;
-            background-color: #f9f9f9;
-        }
-        .shift {
-            margin-top: 5px;
-            padding: 5px;
-            background-color: #d1ecf1;
-            border: 1px solid #bee5eb;
-            border-radius: 5px;
-            font-size: 0.9em;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_shift.css') }}">
 </head>
 <body>
     <h1>Shift Manager</h1>
