@@ -214,7 +214,10 @@ def home():
 @app.route('/home')
 @login_required
 def home2():
-    return render_template('home.html')
+    if current_user.role == 'manager':
+        return render_template('add_shift.html')
+    else:
+        return render_template('home.html')
 
 
 @app.route('/calendar-data')
