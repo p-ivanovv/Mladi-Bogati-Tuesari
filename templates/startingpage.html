@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Merienda:wght@300..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Tektur:wght@400..900&display=swap" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css2?family=Merienda:wght@300..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Poiret+One&family=Tektur:wght@400..900&display=swap" rel="stylesheet"> 
     </head>
     <body>
         <video autoplay muted loop class="video-bg">
@@ -16,12 +16,15 @@
             Your browser does not support HTML5 video.
         </video>
         <div class="overlay"></div>
+        <div class="logo" style="text-align: center; margin-top: 20px;">
+            <img src="{{ url_for('static', filename='images/bobche_logo.png') }}" alt="Bobche Logo">
+        </div>
         <div class="content">
-            <h1>Bobche</h1>
+            <p style="text-align: center;font-weight: bold; font-size: 5em; font-family: 'Poiret One', cursive;">Time is your ally. Use it wisely.</p>
             <div class="buttons">
                 <a href="{{ url_for('login') }}" class="btn">Log In</a>
                 <a href="{{ url_for ('register') }}" class="btn">Sign Up</a>
             </div>
         </div>
     </body>
-        </html>
+</html>
