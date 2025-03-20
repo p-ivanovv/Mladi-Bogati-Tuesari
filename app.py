@@ -137,19 +137,32 @@ def request_time_off():
 
 @app.route('/requests', methods=['GET', 'POST'])
 @login_required
-def view_time_off_requests():
+def requests():
     if current_user.role != 'manager':
         flash("You are not authorized to view this page.")
         return url_for('shifts')
-    return render_template('view_time_off_requests.html')
+    requests = TimeOffRequest.query.all()
+    return render_template('view_time_off_requests.html', requests=requests)
 
 @app.route('/view_time_off_request', methods=['GET', 'POST'])
 @login_required
-def view_time_():
+def view_time_request():
     if current_user.role != 'manager':
         flash("You are not authorized to view this page.")
         return url_for('shifts')
-    return render_template('view_time_off_request.html')
+    if request.method == 'POST':
+        request_id = request.form.get('request_id')
+        action = request.form.get('action')
+        request = TimeOffRequest.query.get(request_id)
+        if action == 'approve':
+            request.status = 'Approved'
+        elif action == 'reject':
+            request.status = 'Rejected'
+
+        db.session.commit()
+        flash("Request updated successfully!")
+        return url_for('requests')
+    return render_template('view_time_off_request.html', requests=requests)
 
 @app.route('/')
 def home():
@@ -198,10 +211,6 @@ def add_shift(user_id):
     shifts = Shifts.query.filter_by(user_id=user_id).all()
     return render_template('plan_all.html', shifts=shifts)
 
-<<<<<<< HEAD
-    #return render_template('startingpage.html')
-  
-=======
 @app.route('/shift/edit/<int:shift_id>', methods=['GET', 'POST'])
 @login_required
 def edit_shift(shift_id):
@@ -227,6 +236,5 @@ def delete_shift(shift_id):
     flash("Shift deleted successfully!")
     return redirect(url_for('calendar_data_all'))
 
->>>>>>> 2e61b1ce5f28f0a8ecb2f95222413960a8f8e7f0
 if __name__ == '__main__':
     app.run(debug=True)
