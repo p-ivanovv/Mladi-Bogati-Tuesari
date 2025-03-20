@@ -19,7 +19,7 @@ class Users(db.Model, UserMixin):
     name = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
     password_hash = db.Column(db.String(128))
-    role = db.Column(db.String(20), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default='employee')
 
     @property
     def password(self):
@@ -90,27 +90,69 @@ def logout():
 	flash("You Have Been Logged Out")
 	return redirect(url_for('login'))
 
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+@login_required
+def update(id):
+	form = UserForm()
+	name_to_update = Users.query.get_or_404(id)
+	if request.method == "POST":
+		name_to_update.name = request.form['name']
+		name_to_update.email = request.form['email']
+		name_to_update.username = request.form['username']
+		try:
+			db.session.commit()
+			flash("User Updated Successfully!")
+			return render_template("update.html", form=form, name_to_update = name_to_update, id=id)
+		except:
+			flash("Error. Looks like there was a problem - try again.")
+			return render_template("update.html", form=form, name_to_update = name_to_update, id=id)
+	else:
+		return render_template("update.html", form=form, name_to_update = name_to_update, id = id)
+
+@app.route('/delete/<int:id>')
+@login_required
+def delete(id):
+	if id == current_user.id:
+		user_to_delete = Users.query.get_or_404(id)
+		name = None
+		form = UserForm()
+
+		try:
+			db.session.delete(user_to_delete)
+			db.session.commit()
+			flash("User Deleted Successfully!!")
+
+			our_users = Users.query.order_by(Users.date_added)
+			return render_template("add_user.html", form=form, name=name, our_users=our_users)
+
+		except:
+			flash("There was a problem deleting user - try again.")
+			return render_template("add_user.html", form=form, name=name,our_users=our_users)
+	else:
+		flash("Sorry, you can't delete that user! ")
+		return redirect(url_for('dashboard'))
+
 @app.route('/user/add', methods=['GET', 'POST'])
 def register():
-	name = None
-	form = UserForm()
-	if form.validate_on_submit():
-		user = Users.query.filter_by(email=form.email.data).first()
-		if user is None:
-			hashed_pw = generate_password_hash(form.password_hash.data)
-			user = Users(username=form.username.data, name=form.name.data, email=form.email.data, password_hash=hashed_pw, role=form.role.data)
-			db.session.add(user)
-			db.session.commit()
-		name = form.name.data
-		form.name.data = ''
-		form.username.data = ''
-		form.email.data = ''
-		form.password_hash.data = ''
-		form.role.data = ''
-		flash("User Added Successfully")
-	return render_template("register.html", 
-		form=form,
-		name=name)
+    name = None
+    form = UserForm()
+    if form.validate_on_submit():  
+        user = Users.query.filter_by(email=form.email.data).first()
+        if user is None:  
+            hashed_pw = generate_password_hash(form.password_hash.data)
+            user = Users(
+                username=form.username.data,
+                name=form.name.data,
+                email=form.email.data,
+                password_hash=hashed_pw,
+                role=form.role.data
+            )
+            db.session.add(user)  
+            db.session.commit()  
+            flash("User Added Successfully")
+            return redirect(url_for('login')) 
+
+    return render_template("register.html", form=form, name=name)
 
 @app.route('/dashboard')
 @login_required
@@ -120,24 +162,49 @@ def dashboard():
 @app.route('/request_time_off', methods=['GET', 'POST'])
 @login_required
 def request_time_off():
-
-    return render_template('request_time_off.html')
+    if request.method == 'POST':
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        reason = request.form.get('reason')
+        if start_date and end_date and reason:
+            new_request = TimeOffRequest(user_id=current_user.id, start_date=start_date, end_date=end_date, reason=reason)
+            db.session.add(new_request)
+            db.session.commit()
+            flash("Request submitted successfully!")
+        else:
+            flash("All fields are required!")
+    requests = TimeOffRequest.query.filter_by(user_id=current_user.id).all()
+    return render_template('request_time_off.html', requests=requests)
+    #return render_template('request_time_off.html')
 
 @app.route('/requests', methods=['GET', 'POST'])
 @login_required
-def view_time_off_requests():
-    if current_user.role == 'manager':
+def requests():
+    if current_user.role != 'manager':
         flash("You are not authorized to view this page.")
         return url_for('shifts')
-    return render_template('view_time_off_requests.html')
+    requests = TimeOffRequest.query.all()
+    return render_template('view_time_off_requests.html', requests=requests)
 
 @app.route('/view_time_off_request', methods=['GET', 'POST'])
 @login_required
-def view_time_off_request():
-    if current_user.role == 'manager':
+def view_time_request():
+    if current_user.role != 'manager':
         flash("You are not authorized to view this page.")
         return url_for('shifts')
-    return render_template('view_time_off_request.html')
+    if request.method == 'POST':
+        request_id = request.form.get('request_id')
+        action = request.form.get('action')
+        request = TimeOffRequest.query.get(request_id)
+        if action == 'approve':
+            request.status = 'Approved'
+        elif action == 'reject':
+            request.status = 'Rejected'
+
+        db.session.commit()
+        flash("Request updated successfully!")
+        return url_for('requests')
+    return render_template('view_time_off_request.html', requests=requests)
 
 @app.route('/')
 def home():

@@ -13,7 +13,7 @@ class UserForm(FlaskForm):
 	email = StringField("Email", validators=[DataRequired()])
 	password_hash = PasswordField('Password', validators=[DataRequired(), EqualTo('password_hash2', message='Passwords Must Match!')])
 	password_hash2 = PasswordField('Confirm Password', validators=[DataRequired()])
-	role = SelectField('Role', choices=[('manager', 'Manager'), ('employee', 'Employee')], validators=[DataRequired()])
+	role = SelectField('Role', choices=[('manager', 'Manager'), ('employee', 'Employee')], validators=[DataRequired()], default='employee')
 	submit = SubmitField("Submit")
 	
 class TimeOffForm(FlaskForm):
