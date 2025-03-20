@@ -7,14 +7,14 @@
                     {% if current_user.is_authenticated %}
                         <ul class="nav navbar-nav">
                             <a href="{{url_for('home2')}}"><button>Home</button></a>
-                            <button onclick="window.location.href='dashboard'">Dashboard</button>
-                            <button onclick="window.location.href='plan.html'">Plan</button>
-                            <button onclick="window.location.href='logout.html'">Logout</button>
+                            <a href="{{url_for('dashboard')}}"><button>Dashboard</button></a>
+                            <a href="{{url_for('logout')}}"><button>Log out</button></a>
                         </ul>
- 
+                    {% else %}
+                        <span class="navbar-text"> <a href="{{url_for('login')}}" class="login">Log In</a></span>
+                        <a class="btn btn-light action-button" role="button" href={{ url_for ('register')}}>Sign Up</a>
                     {% endif %}
-
-                    </form><span class="navbar-text"> <a href="{{url_for('login')}}" class="login">Log In</a></span><a class="btn btn-light action-button" role="button" href={{ url_for ('register')}}>Sign Up</a></div>
+    
             </div>
         </nav>
     </div>
