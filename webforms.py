@@ -15,3 +15,9 @@ class UserForm(FlaskForm):
 	password_hash2 = PasswordField('Confirm Password', validators=[DataRequired()])
 	role = SelectField('Role', choices=[('manager', 'Manager'), ('employee', 'Employee')], validators=[DataRequired()])
 	submit = SubmitField("Submit")
+	
+class TimeOffForm(FlaskForm):
+    start_date = StringField("Start Date", validators=[DataRequired()])
+    end_date = StringField("End Date", validators=[DataRequired()])
+    reason = StringField("Reason", validators=[DataRequired()])
+    submit = SubmitField("Submit")

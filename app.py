@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required
+from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
 from flask import request, flash, redirect, url_for, session
 from webforms import LoginForm, UserForm
 
@@ -98,7 +98,7 @@ def register():
 		user = Users.query.filter_by(email=form.email.data).first()
 		if user is None:
 			hashed_pw = generate_password_hash(form.password_hash.data)
-			user = Users(username=form.username.data, name=form.name.data, email=form.email.data, password_hash=hashed_pw)
+			user = Users(username=form.username.data, name=form.name.data, email=form.email.data, password_hash=hashed_pw, role=form.role.data)
 			db.session.add(user)
 			db.session.commit()
 		name = form.name.data
@@ -107,15 +107,109 @@ def register():
 		form.email.data = ''
 		form.password_hash.data = ''
 		form.role.data = ''
-
 		flash("User Added Successfully")
 	return render_template("register.html", 
 		form=form,
 		name=name)
 
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
+
+@app.route('/request_time_off', methods=['GET', 'POST'])
+@login_required
+def request_time_off():
+
+    return render_template('request_time_off.html')
+
+@app.route('/requests', methods=['GET', 'POST'])
+@login_required
+def view_time_off_requests():
+    if current_user.role == 'manager':
+        flash("You are not authorized to view this page.")
+        return url_for('shifts')
+    return render_template('view_time_off_requests.html')
+
+@app.route('/view_time_off_request', methods=['GET', 'POST'])
+@login_required
+def view_time_off_request():
+    if current_user.role == 'manager':
+        flash("You are not authorized to view this page.")
+        return url_for('shifts')
+    return render_template('view_time_off_request.html')
+
 @app.route('/')
 def home():
     return render_template('startingpage.html')
-  
+
+@app.route('/calendar-data')
+@login_required
+def calendar_data():
+    if session.get('username'):
+        user = Users.query.filter_by(username=session['username']).first()
+        if user.role == 'Employee':
+            shifts = Shifts.query.filter_by(user_id=user.id).all()
+            return render_template('plan.html', shifts=shifts)
+    else:
+        flash("Please log in to access this page.")
+        return redirect(url_for('login'))
+
+@app.route('/calendar-data-all')
+@login_required
+def calendar_data_all():
+    if session.get('username'):
+        user = Users.query.filter_by(username=session['username']).first()
+        if user.role == 'Manager':
+            shifts = Shifts.query.all()
+            return render_template('plan_all.html', shifts=shifts)
+        else:
+            flash("Access Denied: Only managers can view this page.")
+            return redirect(url_for('home'))
+    else:
+        flash("Please log in to access this page.")
+        return redirect(url_for('login'))
+
+@app.route('/shift/add/<int:user_id>', methods=['GET', 'POST'])
+def add_shift(user_id):
+    if request.method == 'POST':
+        date = request.form.get('date')
+        start_time = request.form.get('start_time')
+        end_time = request.form.get('end_time')
+        if date and start_time and end_time:
+            new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id)
+            db.session.add(new_shift)
+            db.session.commit()
+            flash("Shift added successfully!")
+        else:
+            flash("All fields are required!")
+    shifts = Shifts.query.filter_by(user_id=user_id).all()
+    return render_template('plan_all.html', shifts=shifts)
+
+@app.route('/shift/edit/<int:shift_id>', methods=['GET', 'POST'])
+@login_required
+def edit_shift(shift_id):
+    shift = Shifts.query.get_or_404(shift_id)
+    if request.method == 'POST':
+        shift.date = request.form.get('date')
+        shift.start_time = request.form.get('start_time')
+        shift.end_time = request.form.get('end_time')
+        if shift.date and shift.start_time and shift.end_time:
+            db.session.commit()
+            flash("Shift updated successfully!")
+            return redirect(url_for('calendar_data_all'))
+        else:
+            flash("All fields are required!")
+    return render_template('edit_shift.html', shift=shift)
+
+@app.route('/shift/delete/<int:shift_id>', methods=['POST'])
+@login_required
+def delete_shift(shift_id):
+    shift = Shifts.query.get_or_404(shift_id)
+    db.session.delete(shift)
+    db.session.commit()
+    flash("Shift deleted successfully!")
+    return redirect(url_for('calendar_data_all'))
+
 if __name__ == '__main__':
     app.run(debug=True)
