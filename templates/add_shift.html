@@ -55,6 +55,7 @@
 <body>
     <h1>Shift Manager</h1>
     <button id="openModal">Add Shift</button>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary" style="margin-left: 10px;">Go Home</a>
     <div id="shiftModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -74,10 +75,12 @@
                     {% endfor %}
                 </select><br>
                 <button type="submit" id="submitButton">Save Shift</button>
-                {% if is_manager %}
-                    <button type="button" id="deleteButton" style="background-color: red; color: white; display: none;">Delete Shift</button>
-                {% endif %}
             </form>
+            {% if current_user.role == 'manager' %}
+            <form id="deleteShiftForm" method="POST" action="">
+                <button type="submit" id="deleteButton" style="background-color: red; color: white; display: none;">Delete Shift</button>
+            </form>
+            {% endif %}
         </div>
     </div>
     <h2>Shift Calendar</h2>
@@ -100,16 +103,14 @@
         var modal = document.getElementById("shiftModal");
         var btn = document.getElementById("openModal");
         var span = document.getElementsByClassName("close")[0];
-        var form = document.getElementById("shiftForm");
         var shiftIdInput = document.getElementById("shift_id");
         var dateInput = document.getElementById("date");
         var startTimeInput = document.getElementById("start_time");
         var endTimeInput = document.getElementById("end_time");
         var userSelect = document.getElementById("user_id");
         var modalTitle = document.getElementById("modalTitle");
-        var submitButton = document.getElementById("submitButton");
         var deleteButton = document.getElementById("deleteButton");
-        
+
         btn.onclick = function() {
             modal.style.display = "block";
             modalTitle.innerText = "Add Shift";
@@ -119,18 +120,18 @@
             endTimeInput.value = "";
             userSelect.value = "";
             deleteButton.style.display = "none";
-        }
-        
+        };
+
         span.onclick = function() {
             modal.style.display = "none";
-        }
-        
+        };
+
         window.onclick = function(event) {
             if (event.target == modal) {
                 modal.style.display = "none";
             }
-        }
-        
+        };
+
         document.querySelectorAll(".shift").forEach(shift => {
             shift.addEventListener("click", function() {
                 modal.style.display = "block";
@@ -140,15 +141,16 @@
                 startTimeInput.value = this.getAttribute("data-start");
                 endTimeInput.value = this.getAttribute("data-end");
                 userSelect.value = this.getAttribute("data-user");
-                if (isManager) { // isManager should be defined in your script
+                if (deleteButton) {
                     deleteButton.style.display = "inline-block";
-                        deleteButton.onclick = function () {
-                    if (confirm("Are you sure you want to delete this shift?")) {
-                    window.location.href = `/shift/delete/${shiftIdInput.value}`;
-        }
-    };
-}
-
+                    document.getElementById("deleteShiftForm").action = `/shift/delete/${shiftIdInput.value}`;
+                    deleteButton.onclick = function(event) {
+                        event.preventDefault(); // Prevent form submission
+                        if (confirm("Are you sure you want to delete this shift?")) {
+                            document.getElementById("deleteShiftForm").submit();
+                        }
+                    };
+                }
             });
         });
     </script>

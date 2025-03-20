@@ -214,7 +214,10 @@ def home():
 @app.route('/home')
 @login_required
 def home2():
-    return render_template('home.html')
+    if current_user.role == 'manager':
+        return render_template('add_shift.html')
+    else:
+        return render_template('home.html')
 
 
 @app.route('/calendar-data')
@@ -255,7 +258,22 @@ def add_shift():
         start_time = request.form.get('start_time')
         end_time = request.form.get('end_time')
         user_id = request.form.get('user_id')
+
         if date and start_time and end_time and user_id:
+            overlapping_shifts = Shifts.query.filter(
+                Shifts.user_id == user_id,
+                Shifts.date == date,
+                db.or_(
+                    db.and_(Shifts.start_time <= start_time, Shifts.end_time > start_time),
+                    db.and_(Shifts.start_time < end_time, Shifts.end_time >= end_time),
+                    db.and_(Shifts.start_time >= start_time, Shifts.end_time <= end_time)
+                )
+            ).all()
+
+            if overlapping_shifts:
+                flash("Shift overlaps with an existing shift for this employee.")
+                return redirect(url_for('add_shift'))
+
             new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id)
             db.session.add(new_shift)
             db.session.commit()
@@ -266,7 +284,6 @@ def add_shift():
     users = Users.query.all()
     shifts = Shifts.query.all()
 
-    # Convert shift dates to datetime objects for proper comparison
     for shift in shifts:
         shift.date = datetime.strptime(shift.date, '%Y-%m-%d')
 
@@ -285,21 +302,26 @@ def edit_shift(shift_id):
         new_date = request.form.get('date')
         new_start_time = request.form.get('start_time')
         new_end_time = request.form.get('end_time')
-        user_id = shift.user_id  # Keep the same user ID
 
         if new_date and new_start_time and new_end_time:
-            # Delete the old shift
-            db.session.delete(shift)
-            db.session.commit()
+            overlapping_shifts = Shifts.query.filter(
+                Shifts.user_id == shift.user_id,
+                Shifts.date == new_date,
+                Shifts.id != shift.id,
+                db.or_(
+                    db.and_(Shifts.start_time <= new_start_time, Shifts.end_time > new_start_time),
+                    db.and_(Shifts.start_time < new_end_time, Shifts.end_time >= new_end_time),
+                    db.and_(Shifts.start_time >= new_start_time, Shifts.end_time <= new_end_time)
+                )
+            ).all()
 
-            # Create a new shift with the updated details
-            new_shift = Shifts(
-                date=new_date,
-                start_time=new_start_time,
-                end_time=new_end_time,
-                user_id=user_id
-            )
-            db.session.add(new_shift)
+            if overlapping_shifts:
+                flash("Shift overlaps with an existing shift for this employee.")
+                return redirect(url_for('edit_shift', shift_id=shift_id))
+
+            shift.date = new_date
+            shift.start_time = new_start_time
+            shift.end_time = new_end_time
             db.session.commit()
             flash("Shift updated successfully!")
             return redirect(url_for('calendar_data_all'))
@@ -317,7 +339,7 @@ def delete_shift(shift_id):
     db.session.delete(shift)
     db.session.commit()
     flash("Shift deleted successfully!")
-    return redirect(url_for('calendar_data_all'))
+    return redirect(url_for('add_shift'))
 
 if __name__ == '__main__':
     app.run(debug=True)

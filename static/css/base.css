@@ -54,3 +54,11 @@ body, html {
     background-color: black;
     color: white;
 }
+
+.logo {
+    position: absolute;
+    top: calc(50% - 470px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+}
