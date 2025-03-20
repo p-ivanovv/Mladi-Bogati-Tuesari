@@ -4,6 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Shift</title>
+    <style>
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .day {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        .shift {
+            margin-top: 5px;
+            padding: 5px;
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
     <h1>Add Shift</h1>
@@ -23,28 +45,21 @@
         <button type="submit">Add Shift</button>
     </form>
 
-    <h2>Current Shifts</h2>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Shift ID</th>
-                <th>Date</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Assigned User</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for shift in shifts %}
-                <tr>
-                    <td>{{ shift.id }}</td>
-                    <td>{{ shift.date }}</td>
-                    <td>{{ shift.start_time }}</td>
-                    <td>{{ shift.end_time }}</td>
-                    <td>{{ shift.user.name }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h2>Shift Calendar</h2>
+    <div class="calendar">
+        {% for day in calendar_days %}
+            <div class="day"></div>
+                <strong>{{ day.strftime('%A, %d %B') }}</strong>
+                {% for shift in shifts %}
+                    {% if shift.date == day.strftime('%Y-%m-%d') %}
+                        <div class="shift">
+                            <strong>{{ shift.user.name }}</strong><br>
+                            {{ shift.start_time }} - {{ shift.end_time }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
 </body>
 </html>
