@@ -160,11 +160,6 @@ def register():
 def dashboard():
     return render_template('dashboard.html')
 
-@app.route('/plan')
-@login_required
-def plan():
-    return render_template('plan.html')
-
 @app.route('/request_time_off', methods=['GET', 'POST'])
 @login_required
 def request_time_off():
