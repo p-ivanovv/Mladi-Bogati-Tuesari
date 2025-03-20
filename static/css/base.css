@@ -6,7 +6,7 @@ body, html {
 }
 .video-bg {
     position: absolute;
-    top: -100;
+    top: 0;
     left: 0;
     width: 100%;
     height: auto;
