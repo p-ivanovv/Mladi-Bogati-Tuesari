@@ -6,9 +6,9 @@ body, html {
 }
 .video-bg {
     position: absolute;
-    top: 0;
+    top: -100;
     left: 0;
-    width: 120%;
+    width: 100%;
     height: auto;
     min-height: 100%;
     object-fit: cover;
