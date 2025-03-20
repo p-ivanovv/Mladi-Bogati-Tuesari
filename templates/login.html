@@ -1,46 +1,38 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 {% for message in get_flashed_messages() %}
-    
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-
-    
 {% endfor %}
 
+<div class="container mt-5 d-flex justify-content-center">
+    <div class="col-md-6">
+        <h1 class="text-center mb-4">Log In</h1>
+        <div class="text-center mb-4">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="max-width: 100px;">
+        </div>
+        <div class="shadow p-4 mb-5 bg-body rounded">
+            <form method="POST">
+                {{ form.hidden_tag() }}
 
+                <div class="mb-3">
+                    {{ form.username.label(class="form-label", style="color: black;") }}
+                    {{ form.username(class="form-control") }}
+                </div>
 
-    <h1>Login</h1>
-    <br/><br/>
+                <div class="mb-3">
+                    {{ form.password.label(class="form-label", style="color: black;") }}
+                    {{ form.password(class="form-control") }}
+                </div>
 
-    
-
-<div class="shadow p-3 mb-5 bg-body rounded">
-    <form method="POST">
-        {{ form.hidden_tag() }}
-
-        {{ form.username.label(class="form-label", style="color: black;") }}
-
-        {{ form.username(class="form-control") }}
-        <br/>
-
-        {{ form.password.label(class="form-label", style="color: black;") }}
-
-        {{ form.password(class="form-control") }}
-        <br/>
-
-        
-        <br/>
-
-        {{ form.submit(class="btn btn-secondary") }}
-
-
-    </form>
+                <div class="d-flex justify-content-center">
+                    {{ form.submit(class="btn btn-primary btn-block", style="height: 70px; width: 120px; font-size: 1.5em;") }}
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
-
-
 {% endblock %}
