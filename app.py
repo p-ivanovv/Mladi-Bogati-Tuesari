@@ -109,7 +109,7 @@ def register():
 		form.role.data = ''
 
 		flash("User Added Successfully")
-	return render_template("add_user.html", 
+	return render_template("register.html", 
 		form=form,
 		name=name)
 
@@ -142,5 +142,7 @@ def add_shift(user_id):
     shifts = Shifts.query.filter_by(user_id=user_id).all()
     return render_template('plan_all.html', shifts=shifts)
 
+    return render_template('startingpage.html')
+  
 if __name__ == '__main__':
     app.run(debug=True)
