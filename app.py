@@ -90,6 +90,48 @@ def logout():
 	flash("You Have Been Logged Out")
 	return redirect(url_for('login'))
 
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+@login_required
+def update(id):
+	form = UserForm()
+	name_to_update = Users.query.get_or_404(id)
+	if request.method == "POST":
+		name_to_update.name = request.form['name']
+		name_to_update.email = request.form['email']
+		name_to_update.username = request.form['username']
+		try:
+			db.session.commit()
+			flash("User Updated Successfully!")
+			return render_template("update.html", form=form, name_to_update = name_to_update, id=id)
+		except:
+			flash("Error. Looks like there was a problem - try again.")
+			return render_template("update.html", form=form, name_to_update = name_to_update, id=id)
+	else:
+		return render_template("update.html", form=form, name_to_update = name_to_update, id = id)
+
+@app.route('/delete/<int:id>')
+@login_required
+def delete(id):
+	if id == current_user.id:
+		user_to_delete = Users.query.get_or_404(id)
+		name = None
+		form = UserForm()
+
+		try:
+			db.session.delete(user_to_delete)
+			db.session.commit()
+			flash("User Deleted Successfully!!")
+
+			our_users = Users.query.order_by(Users.date_added)
+			return render_template("add_user.html", form=form, name=name, our_users=our_users)
+
+		except:
+			flash("There was a problem deleting user - try again.")
+			return render_template("add_user.html", form=form, name=name,our_users=our_users)
+	else:
+		flash("Sorry, you can't delete that user! ")
+		return redirect(url_for('dashboard'))
+
 @app.route('/user/add', methods=['GET', 'POST'])
 def register():
     name = None
