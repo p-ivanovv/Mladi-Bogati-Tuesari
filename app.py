@@ -117,5 +117,30 @@ def register():
 def home():
     return render_template('home.html')
 
+@app.route('/calendar-data')
+def calendar_data():
+    return render_template('plan.html')
+
+@app.route('/calendar-data-all')
+def calendar_data_all():
+    shifts = Shifts.query.all()
+    return render_template('plan_all.html', shifts=shifts)
+
+@app.route('/shift/add/<int:user_id>', methods=['GET', 'POST'])
+def add_shift(user_id):
+    if request.method == 'POST':
+        date = request.form.get('date')
+        start_time = request.form.get('start_time')
+        end_time = request.form.get('end_time')
+        if date and start_time and end_time:
+            new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id)
+            db.session.add(new_shift)
+            db.session.commit()
+            flash("Shift added successfully!")
+        else:
+            flash("All fields are required!")
+    shifts = Shifts.query.filter_by(user_id=user_id).all()
+    return render_template('plan_all.html', shifts=shifts)
+
 if __name__ == '__main__':
     app.run(debug=True)
