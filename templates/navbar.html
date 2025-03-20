@@ -4,7 +4,25 @@
         <nav class="navbar navbar-dark navbar-expand-md navigation-clean-search">
                 <button class="navbar-toggler" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navcol-1">
-
+                    {% if current_user.is_authenticated %}
+                        <ul class="nav navbar-nav">
+                            <button onclick="window.location.href='home.html'">Home</button>
+                            <button onclick="window.location.href='profile.html'">Profile</button>
+                            <button onclick="window.location.href='plan.html'">Plan</button>
+                            <button onclick="window.location.href='logout.html'">Logout</button>
+                        </ul>
+                    {% else %}
+                        <ul class="nav navbar-nav">
+                            <button onclick="window.location.href='home.html'">Home</button>
+                            <button onclick="window.location.href='plan.html'">Plan</button>
+                            <button onclick="window.location.href='logout.html'">Logout</button>
+                        </ul>
+                    {% endif %}
+                    <ul class="nav navbar-nav">
+                        <button onclick="window.location.href='home.html'">Home</button>
+                        <button onclick="window.location.href='profile.html'">Profile</button>
+                        <button onclick="window.location.href='plan.html'">Plan</button>
+                        <button onclick="window.location.href='logout.html'">Logout</button>
                     </ul>
                     </form><span class="navbar-text"> <a href="{{url_for('login')}}" class="login">Log In</a></span><a class="btn btn-light action-button" role="button" href={{ url_for ('register')}}>Sign Up</a></div>
             </div>
