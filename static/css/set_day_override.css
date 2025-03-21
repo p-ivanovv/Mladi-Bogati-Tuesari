@@ -1,3 +1,10 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+}
+
 form {
     display: flex;
     flex-direction: column;
