@@ -418,6 +418,13 @@ def add_shift():
     if current_user.role != 'manager':
         flash("Access Denied: Only managers can add shifts.")
         return redirect(url_for('home'))
+    
+    company = Company.query.filter_by(manager_id=current_user.id).first()
+    
+    if not company:
+        flash("You need to create a company first!", "warning")
+        return redirect(url_for('dashboard'))
+
     if request.method == 'POST':
         shift_id = request.form.get('shift_id')
         date = request.form.get('date')
@@ -439,12 +446,13 @@ def add_shift():
             flash("Start time must be earlier than end time.")
             return redirect(url_for('add_shift'))
 
-        if shift_id:
-            old_shift = Shifts.query.get(shift_id)
-            if old_shift:
-                db.session.delete(old_shift)
-                db.session.commit()
+        # Ensure the employee is part of the manager's company
+        user = Users.query.filter_by(id=user_id, company_id=company.id).first()
+        if not user:
+            flash("This employee is not part of your company!", "danger")
+            return redirect(url_for('add_shift'))
 
+        # Prevent shift overlaps
         overlapping_shifts = Shifts.query.filter(
             Shifts.user_id == user_id,
             Shifts.date == date,
@@ -459,24 +467,36 @@ def add_shift():
             flash("Shift overlaps with an existing shift for this employee.")
             return redirect(url_for('add_shift'))
 
-        user = Users.query.get(user_id)
-        if not user:
-            flash("Selected user does not exist.")
-            return redirect(url_for('add_shift'))
+        # Create or update the shift
+        if shift_id:
+            old_shift = Shifts.query.get(shift_id)
+            if old_shift:
+                db.session.delete(old_shift)
+                db.session.commit()
 
-        new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id, day=day, skill=user.skill)
+        new_shift = Shifts(
+            date=date, 
+            start_time=start_time, 
+            end_time=end_time, 
+            user_id=user_id, 
+            day=day, 
+            skill=user.skill
+        )
         db.session.add(new_shift)
         db.session.commit()
 
         flash("Shift updated successfully!" if shift_id else "Shift added successfully!")
         return redirect(url_for('add_shift'))
 
-    users = Users.query.all()
+    # Only show employees from the manager's company
+    employees = Users.query.filter_by(company_id=company.id, role='employee').all()
     shifts = Shifts.query.all()
 
     today = datetime.now()
     calendar_days = [today + timedelta(days=i) for i in range(7)]
-    return render_template('add_shift.html', users=users, shifts=shifts, calendar_days=calendar_days)
+    
+    return render_template('add_shift.html', employees=employees, shifts=shifts, calendar_days=calendar_days)
+
 
 @app.route('/shift/delete/<int:shift_id>', methods=['POST'])
 @login_required
