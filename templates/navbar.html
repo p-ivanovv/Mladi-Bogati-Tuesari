@@ -12,7 +12,8 @@
                         </ul>
                     {% else %}
                         <span class="navbar-text"> <a href="{{url_for('login')}}" class="login">Log In</a></span>
-                        <a class="btn btn-light action-button" role="button" href={{ url_for ('register')}}>Sign Up</a>
+                        <a class="btn btn-light action-button" role="button" href="{{ url_for('register') }}">Sign Up</a>
+
                     {% endif %}
     
             </div>

@@ -40,7 +40,8 @@
     <div class="calendar">
         {% for day in calendar_days %}
             <div class="day">
-                <strong>{{ day.strftime('%A, %d %B') }}</strong>
+                <strong>{{ day.strftime('%A') }}</strong><br>
+                <span>{{ day.strftime('%d %B') }}</span>
                 {% for shift in shifts %}
                     {% if shift.date.date() == day.date() %}
                         <div class="shift" data-id="{{ shift.id }}" data-date="{{ shift.date }}" data-start="{{ shift.start_time }}" data-end="{{ shift.end_time }}" data-user="{{ shift.user.id }}">
