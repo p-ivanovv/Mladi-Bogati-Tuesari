@@ -1,11 +1,18 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<details>
+<details class="taskbar">
     <summary></summary>
     <nav class="menu">
-      <a href="#link">Home</a>
-      <a href="#link">Work</a>
-      <a href="#link">Links</a>
-      <a href="#link">Contact</a>
-      <a href="#link">About</a>
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('add_shift') }}">Shifts</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        {% if not current_user.is_authenticated %}
+            {% if request.endpoint == 'register' %}
+                <a href="{{ url_for('login') }}">Login</a>
+            {% elif request.endpoint == 'login' %}
+                <a href="{{ url_for('register') }}">Register</a>
+            {% endif %}
+        {% else %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% endif %}
     </nav>
 </details>

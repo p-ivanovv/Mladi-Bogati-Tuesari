@@ -102,3 +102,10 @@ details[open]::before {
     opacity: 0;
   }
 }
+
+.taskbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
