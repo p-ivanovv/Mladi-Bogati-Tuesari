@@ -26,13 +26,21 @@ class Users(db.Model, UserMixin):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password_hash = db.Column(db.String(128))
     role = db.Column(db.String(20), nullable=False, default='employee')
-    skill = db.Column(db.String(200), nullable=True)
-    
-    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)  # Explicit Foreign Key
+    _skill = db.Column("skill", db.String(200), nullable=True)  # Internal column for skill
 
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)  # Explicit Foreign Key
     company = db.relationship('Company', backref='employees', foreign_keys=[company_id])  # Explicitly set FK
 
+    @property
+    def skill(self):
+        return self._skill
 
+    @skill.setter
+    def skill(self, value):
+        if value:
+            self._skill = value.capitalize()  # Capitalize the first letter
+        else:
+            self._skill = value
 
     @property
     def password(self):
@@ -605,40 +613,33 @@ def build_weekly_requirements(works_on_weekends):
 def generate_schedule(works_on_weekends):
     model = cp_model.CpModel()
 
-    # Fetch data from the database
     employees = Users.query.filter_by(role="employee").all()
     shift_templates = ShiftTemplate.query.all()
     day_overrides = DaySpecificOverride.query.all()
     approved_time_offs = TimeOffRequest.query.filter_by(status="Approved").all()
 
-    # Debugging: Log input data
     print("Employees:", [(emp.id, emp.username, emp.skill) for emp in employees])
     print("Shift Templates:", [(t.day_type, t.start_time, t.end_time, t.skill, t.required_employees) for t in shift_templates])
     print("Day Overrides:", [(o.day, o.start_time, o.end_time, o.skill, o.required_employees) for o in day_overrides])
 
-    # Map abbreviated day names to full day names
     day_name_map = {
         "Mon": "Monday", "Tue": "Tuesday", "Wed": "Wednesday",
         "Thu": "Thursday", "Fri": "Friday", "Sat": "Saturday", "Sun": "Sunday"
     }
 
-    # Create a mapping from full day names to dates
     today = datetime.now()
     day_to_date = {
         full_day: (today + timedelta(days=i)).date()
         for i, full_day in enumerate(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
     }
 
-    # Initialize employee data
     employee_ids = [emp.id for emp in employees]
     employee_skills = {emp.id: emp.skill for emp in employees}
 
-    # Map approved time-off requests
     time_off_map = {emp.id: [] for emp in employees}
     for request in approved_time_offs:
         time_off_map[request.user_id].append((request.start_date, request.end_date))
 
-    # Build shifts needed based on templates and overrides
     shifts_needed = {}
     for template in shift_templates:
         day_range = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] if template.day_type == "Weekday" else ["Saturday", "Sunday"]
@@ -649,15 +650,12 @@ def generate_schedule(works_on_weekends):
             shifts_needed[key] = template.required_employees
 
     for override in day_overrides:
-        # Normalize day names
         full_day_name = day_name_map.get(override.day, override.day)
         key = (full_day_name, override.start_time, override.end_time, override.skill)
         shifts_needed[key] = override.required_employees
 
-    # Debugging: Log shifts needed
     print("Shifts Needed After Overrides:", shifts_needed)
 
-    # Create variables and constraints
     employee_shifts = {}
     for emp_id in employee_ids:
         for (day, start_time, end_time, skill), required_employees in shifts_needed.items():
@@ -669,12 +667,12 @@ def generate_schedule(works_on_weekends):
                 f"emp_{emp_id}_{day}_{start_time}_{end_time}_{skill}"
             )
 
-    # Add staffing constraints
     for (day, start_time, end_time, skill), required_employees in shifts_needed.items():
         eligible_employees = [
             emp_id for emp_id in employee_ids
             if (emp_id, day, start_time, end_time, skill) in employee_shifts
         ]
+        print(f"Eligible employees for {day}, {start_time}-{end_time}, Skill: {skill}: {eligible_employees}")  
         if len(eligible_employees) < required_employees:
             print(f"Not enough eligible employees for {day}, {start_time}-{end_time}, Skill: {skill}")
             continue
@@ -683,7 +681,6 @@ def generate_schedule(works_on_weekends):
         )
         print(f"Added staffing constraint for {day}, {start_time}-{end_time}, Skill: {skill}, Required: {required_employees}")
 
-    # Add fairness constraints (optional)
     total_shifts = {emp_id: model.NewIntVar(0, len(shifts_needed), f"total_shifts_{emp_id}") for emp_id in employee_ids}
     for emp_id in employee_ids:
         model.Add(
@@ -699,7 +696,6 @@ def generate_schedule(works_on_weekends):
     model.AddMinEquality(min_shifts, [total_shifts[emp_id] for emp_id in employee_ids])
     model.Add(max_shifts - min_shifts <= 1)
 
-    # Solve the model
     solver = cp_model.CpSolver()
     status = solver.Solve(model)
 
@@ -732,57 +728,37 @@ def generate_schedule_route():
 
     if not schedule:
         flash("No feasible schedule could be generated.", "error")
-        print("No feasible schedule could be generated.")  # Debugging
+        print("No feasible schedule could be generated.")  
         return redirect('/view_schedule')
 
-    print("Generated Schedule:", schedule)  # Debugging
+    print("Generated Schedule:", schedule)  
 
     try:
         for (date, day, start_time, end_time, skill), employee_ids in schedule.items():
             for emp_id in employee_ids:
-                # Format `start_time` and `end_time` as strings
-                if isinstance(start_time, datetime.time):
-                    start_time_str = start_time.strftime('%H:%M')
-                elif isinstance(start_time, str):  # If already a string, use as-is
-                    start_time_str = start_time
-                else:
-                    raise ValueError(f"Invalid start_time type: {type(start_time)}")
+                start_time_str = start_time.strftime('%H:%M')
+                end_time_str = end_time.strftime('%H:%M')
+                date_str = date.strftime('%Y-%m-%d')
 
-                if isinstance(end_time, datetime.time):
-                    end_time_str = end_time.strftime('%H:%M')
-                elif isinstance(end_time, str):  # If already a string, use as-is
-                    end_time_str = end_time
-                else:
-                    raise ValueError(f"Invalid end_time type: {type(end_time)}")
-
-                # Format `date` as a string
-                if isinstance(date, datetime.date):
-                    date_str = date.strftime('%Y-%m-%d')
-                elif isinstance(date, str):  # If already a string, use as-is
-                    date_str = date
-                else:
-                    raise ValueError(f"Invalid date type: {type(date)}")
-
-                # Add the shift to the database
                 shift = Shifts(
-                    date=date_str,  # Use formatted date
+                    date=date_str,  
                     day=day,
-                    start_time=start_time_str,  # Use formatted start_time
-                    end_time=end_time_str,  # Use formatted end_time
+                    start_time=start_time_str,  
+                    end_time=end_time_str,  
                     user_id=emp_id,
                     skill=skill
                 )
                 db.session.add(shift)
-                print(f"Added shift: {shift}")  # Debugging
+                print(f"Added shift: {shift}")  
 
-        # Commit the changes to the database
+        
         db.session.commit()
         flash("Schedule successfully generated!", "success")
-        print("Schedule successfully saved to the database.")  # Debugging
+        print("Schedule successfully saved to the database.")  
     except Exception as e:
         db.session.rollback()
         flash("An error occurred while saving the schedule.", "error")
-        print(f"Error saving schedule to database: {e}")  # Debugging
+        print(f"Error saving schedule to database: {e}")  
 
     return redirect('/view_schedule')
 
