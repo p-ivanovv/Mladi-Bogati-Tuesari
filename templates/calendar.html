@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,3 +84,21 @@
     </table>
 </body>
 </html>
+=======
+<div class="calendar">
+    {% for day in calendar_days %}
+        <div class="day">
+            <strong>{{ day.strftime('%A') }}</strong><br>
+            <span>{{ day.strftime('%d %B') }}</span>
+            {% for shift in shifts %}
+                {% if shift.date == day.strftime('%Y-%m-%d') %}
+                    <div class="shift" data-id="{{ shift.id }}" data-date="{{ shift.date }}" data-start="{{ shift.start_time }}" data-end="{{ shift.end_time }}" data-user="{{ shift.user.id }}">
+                        <strong>{{ shift.user.name }}</strong><br>
+                        {{ shift.start_time }} - {{ shift.end_time }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+>>>>>>> 36fa34ae545512b345baf7ce4c616e1aaa8745d5

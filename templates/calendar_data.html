@@ -18,7 +18,8 @@
                     {% for shift in shifts %}
                         {% if shift.date == day.strftime('%Y-%m-%d') and shift.user_id == current_user.id %}
                             <div class="shift">
-                                {{ shift.start_time }} - {{ shift.end_time }}
+                                {{ shift.start_time }} - {{ shift.end_time }}<br>
+                                <strong>Skill:</strong> {{ shift.user.skill or "Not Assigned" }}
                             </div>
                         {% endif %}
                     {% endfor %}

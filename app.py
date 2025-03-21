@@ -50,6 +50,7 @@ class Shifts(db.Model):
     start_time = db.Column(db.String(20), nullable=False)
     end_time = db.Column(db.String(20), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    skill = db.Column(db.String(100), nullable=False)  
 
     def __repr__(self):
         return '<Shift %r>' % self.id
@@ -68,7 +69,7 @@ class ShiftTemplate(db.Model):
     day_type = db.Column(db.String(20), nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
-    skill = db.Column(db.String(100), nullable=False) 
+    skill = db.Column(db.String(100), nullable=False)  
     required_employees = db.Column(db.Integer, nullable=False)
 
 class DaySpecificOverride(db.Model):
@@ -77,7 +78,7 @@ class DaySpecificOverride(db.Model):
     day = db.Column(db.String(50), nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
-    skill = db.Column(db.String(100), nullable=False)
+    skill = db.Column(db.String(100), nullable=False)  
     required_employees = db.Column(db.Integer, nullable=False)
 
 class CompanyConfig(db.Model):
@@ -359,6 +360,7 @@ def add_shift():
                 flash("Shift overlaps with an existing shift for this employee.")
                 return redirect(url_for('add_shift'))
 
+            # Add the new shift
             new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id, day=day)
             db.session.add(new_shift)
             db.session.commit()
@@ -506,97 +508,10 @@ def build_weekly_requirements(works_on_weekends):
 
     return weekly_requirements, employees
 
-def generate_schedule(db_session, works_on_weekends):
-    model = cp_model.CpModel()
-
-    employees = db_session.query(Users).filter_by(role="employee").all()
-    shift_templates = db_session.query(ShiftTemplate).all()
-    day_overrides = db_session.query(DaySpecificOverride).all()
-
-    employee_ids = [emp.id for emp in employees]
-    employee_skills = {emp.id: emp.skill for emp in employees}
-
-    shifts_needed = {"weekday": {}, "weekend": {}}
-    for template in shift_templates:
-        if template.day_type == "weekday":
-            shifts_needed["weekday"][(template.start_time, template.end_time, template.skill)] = template.employees
-        elif works_on_weekends and template.day_type == "weekend":
-            shifts_needed["weekend"][(template.start_time, template.end_time, template.skill)] = template.employees
-
-    for override in day_overrides:
-        shifts_needed["weekday"][(override.start_time, override.end_time, override.skill)] = override.employees
-
-    employee_shifts = {}
-    for emp_id in employee_ids:
-        for day in range(7): 
-            for (start_time, end_time, skill) in shifts_needed["weekday"]:
-                employee_shifts[(emp_id, day, start_time, end_time, skill)] = model.NewBoolVar(
-                    f"emp_{emp_id}_day_{day}_{start_time}_{end_time}_{skill}"
-                )
-
-    for day in range(5):  
-        for (start_time, end_time, skill), num_employees in shifts_needed["weekday"].items():
-            model.Add(
-                sum(
-                    employee_shifts[(emp_id, day, start_time, end_time, skill)]
-                    for emp_id in employee_ids
-                    if employee_skills[emp_id] == skill
-                )
-                >= num_employees
-            )
-
-    if works_on_weekends:
-        for day in [5, 6]:  
-            for (start_time, end_time, skill), num_employees in shifts_needed["weekend"].items():
-                model.Add(
-                    sum(
-                        employee_shifts[(emp_id, day, start_time, end_time, skill)]
-                        for emp_id in employee_ids
-                        if employee_skills[emp_id] == skill
-                    )
-                    >= num_employees
-                )
-
-    for emp_id in employee_ids:
-        total_shifts = sum(
-            employee_shifts[(emp_id, day, start_time, end_time, skill)]
-            for day in range(7)
-            for (start_time, end_time, skill) in shifts_needed["weekday"]
-        )
-        for other_emp_id in employee_ids:
-            if emp_id != other_emp_id:
-                other_total_shifts = sum(
-                    employee_shifts[(other_emp_id, day, start_time, end_time, skill)]
-                    for day in range(7)
-                    for (start_time, end_time, skill) in shifts_needed["weekday"]
-                )
-                model.Add(total_shifts <= other_total_shifts + 1)
-
-    solver = cp_model.CpSolver()
-    status = solver.Solve(model)
-
-    if status in (cp_model.FEASIBLE, cp_model.OPTIMAL):
-        for emp_id in employee_ids:
-            for day in range(7):
-                for (start_time, end_time, skill) in shifts_needed["weekday"]:
-                    if solver.Value(employee_shifts[(emp_id, day, start_time, end_time, skill)]) == 1:
-                        shift = Shifts(
-                            date=None,  
-                            day=day,
-                            start_time=start_time,
-                            end_time=end_time,
-                            user_id=emp_id
-                        )
-                        db_session.add(shift)
-        db_session.commit()
-        return "Schedule generated successfully!"
-    else:
-        return f"Solver failed with status: {status}"
-
-    
 def generate_schedule(works_on_weekends):
     model = cp_model.CpModel()
 
+    # Fetch data from the database
     employees = Users.query.filter_by(role="employee").all()
     shift_templates = ShiftTemplate.query.all()
     day_overrides = DaySpecificOverride.query.all()
@@ -608,28 +523,45 @@ def generate_schedule(works_on_weekends):
     employee_ids = [emp.id for emp in employees]
     employee_skills = {emp.id: emp.skill for emp in employees}
 
+    # Prepare shifts_needed dictionary
     shifts_needed = {"weekday": {}, "weekend": {}}
+
+    # Add shift templates to shifts_needed
     for template in shift_templates:
         if template.day_type == "weekday":
             shifts_needed["weekday"][(template.start_time, template.end_time, template.skill)] = template.required_employees
         elif works_on_weekends and template.day_type == "weekend":
             shifts_needed["weekend"][(template.start_time, template.end_time, template.skill)] = template.required_employees
 
+    # Apply day-specific overrides
     for override in day_overrides:
-        shifts_needed["weekday"][(override.start_time, override.end_time, override.skill)] = override.required_employees
+        override_key = (override.start_time, override.end_time, override.skill)
+        if override.day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]:
+            # Adjust the weekday shifts for the specific day
+            if override_key in shifts_needed["weekday"]:
+                shifts_needed["weekday"][override_key] += override.required_employees
+            else:
+                shifts_needed["weekday"][override_key] = override.required_employees
+        elif works_on_weekends and override.day in ["Saturday", "Sunday"]:
+            # Adjust the weekend shifts for the specific day
+            if override_key in shifts_needed["weekend"]:
+                shifts_needed["weekend"][override_key] += override.required_employees
+            else:
+                shifts_needed["weekend"][override_key] = override.required_employees
 
-    print("Shifts Needed:", shifts_needed)
+    print("Shifts Needed After Overrides:", shifts_needed)
 
+    # Define decision variables
     employee_shifts = {}
     for emp_id in employee_ids:
-        for day in range(7):  
+        for day in range(7):  # Days of the week
             for (start_time, end_time, skill) in shifts_needed["weekday"]:
                 employee_shifts[(emp_id, day, start_time, end_time, skill)] = model.NewBoolVar(
                     f"emp_{emp_id}_day_{day}_{start_time}_{end_time}_{skill}"
                 )
 
-
-    for day in range(5):  
+    # Add constraints
+    for day in range(5):  # Weekdays
         for (start_time, end_time, skill), num_employees in shifts_needed["weekday"].items():
             model.Add(
                 sum(
@@ -642,7 +574,7 @@ def generate_schedule(works_on_weekends):
             print(f"Added staffing constraint for {day}, {start_time}-{end_time}, Skill: {skill}, Required: {num_employees}")
 
     if works_on_weekends:
-        for day in [5, 6]:  
+        for day in [5, 6]:  # Saturday and Sunday
             for (start_time, end_time, skill), num_employees in shifts_needed["weekend"].items():
                 model.Add(
                     sum(
@@ -654,22 +586,7 @@ def generate_schedule(works_on_weekends):
                 )
                 print(f"Added weekend staffing constraint for {day}, {start_time}-{end_time}, Skill: {skill}, Required: {num_employees}")
 
-    for emp_id in employee_ids:
-        total_shifts = sum(
-            employee_shifts[(emp_id, day, start_time, end_time, skill)]
-            for day in range(7)
-            for (start_time, end_time, skill) in shifts_needed["weekday"]
-        )
-        for other_emp_id in employee_ids:
-            if emp_id != other_emp_id:
-                other_total_shifts = sum(
-                    employee_shifts[(other_emp_id, day, start_time, end_time, skill)]
-                    for day in range(7)
-                    for (start_time, end_time, skill) in shifts_needed["weekday"]
-                )
-                model.Add(total_shifts <= other_total_shifts + 1)
-                print(f"Added fairness constraint for Employee {emp_id} vs Employee {other_emp_id}")
-
+    # Solve the model
     solver = cp_model.CpSolver()
     status = solver.Solve(model)
 
@@ -691,28 +608,65 @@ def generate_schedule(works_on_weekends):
 
     
 @app.route('/generate_schedule', methods=['GET', 'POST'])
-def generate_schedule_route(works_on_weekends):
-    schedule = generate_schedule(works_on_weekends)
+@login_required
+def generate_schedule_route():
     if current_user.role != 'manager': 
-        flash("Access Denied: Only managers can generate schedule.")
+        flash("Access Denied: Only managers can generate schedules.")
         return redirect(url_for('home'))
-    
+
+    # Fetch company configuration
+    config = CompanyConfig.query.first()
+    works_on_weekends = config.works_on_weekends if config else False
+
+    # Generate the schedule
+    schedule = generate_schedule(works_on_weekends)
+
     if not schedule:
         flash("No feasible schedule could be generated. Please adjust the constraints or input data.", "error")
-    else:
-        today = datetime.now()
-        for (day, start_time, skill), employee_ids in schedule.items():
-            for emp_id in employee_ids:
-                shift_date = today + timedelta(days=day) 
-                shift = Shifts(
-                    date=shift_date.strftime('%Y-%m-%d'),
-                    day=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][day],
-                    start_time=start_time.strftime('%H:%M'), 
-                    user_id=emp_id
-                )
-                db.session.add(shift)
+        return redirect('/view_schedule')
+
+    # Debugging: Print the generated schedule
+    print("Generated Schedule:", schedule)
+
+    # Save the schedule to the database
+    today = datetime.now()
+    for (day, start_time, skill), employee_ids in schedule.items():
+        for emp_id in employee_ids:
+            # Retrieve the end_time from the ShiftTemplate
+            end_time = None
+            for template in ShiftTemplate.query.all():
+                if template.start_time.strftime('%H:%M') == start_time and template.skill == skill:
+                    end_time = template.end_time.strftime('%H:%M')
+                    break
+
+            if not end_time:
+                flash(f"End time not found for start_time={start_time}, skill={skill}.", "error")
+                return redirect('/view_schedule')
+
+            # Calculate the shift date
+            shift_date = today + timedelta(days=day)
+
+            # Debugging: Print the shift being added
+            print(f"Adding Shift: Date={shift_date.strftime('%Y-%m-%d')}, Day={day}, Start={start_time}, End={end_time}, User ID={emp_id}")
+
+            # Add the shift to the database
+            shift = Shifts(
+                date=shift_date.strftime('%Y-%m-%d'),
+                day=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][day],
+                start_time=start_time,
+                end_time=end_time,
+                user_id=emp_id
+            )
+            db.session.add(shift)
+
+    # Commit the changes to the database
+    try:
         db.session.commit()
         flash("Schedule successfully generated!", "success")
+    except Exception as e:
+        db.session.rollback()
+        print("Error saving schedule to database:", e)
+        flash("An error occurred while saving the schedule. Please try again.", "error")
 
     return redirect('/view_schedule')
 
@@ -723,8 +677,8 @@ def view_schedule():
         flash("Access Denied: Only managers can view schedule.")
         return redirect(url_for('home'))
     shifts = Shifts.query.options(joinedload(Shifts.user)).all()
+    print("Shifts:", shifts)  
     return render_template('schedule.html', shifts=shifts)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
