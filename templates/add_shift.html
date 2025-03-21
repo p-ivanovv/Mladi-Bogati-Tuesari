@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shift Manager</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/add_shift.css') }}">
+    <style>
+        .modal-content {
+            /* Add this block to move the modal content higher */
+            position: relative;
+            top: -50px;
+        }
+    </style>
 </head>
 <body>
     <button id="openModal">Add Shift</button>

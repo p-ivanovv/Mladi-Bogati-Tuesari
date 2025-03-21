@@ -15,43 +15,39 @@
     </div>
     <br/><br/>
 {% else %}
-    <div class="container mt-5 d-flex justify-content-center">
-        <div class="col-md-6">
-            <h1 class="text-center mb-4">Sign Up</h1>
-            <div class="shadow p-4 mb-5 bg-body rounded">
+    <div class="container mt-1 d-flex justify-content-center">
+        <div class="col-md-5">
+            <h1 class="text-center mb-4" style="position: relative; top: -50px;">Sign Up</h1> <!-- Move this text higher -->
+            <div class="shadow p-4 mb-5 bg-body rounded register-form" style="position: relative; top: -50px;">
                 <form method="POST">
                     {{ form.hidden_tag() }}
-
-                    <div class="mb-3">
-                        {{ form.name.label(class="form-label", style="color: black;") }}
-                        {{ form.name(class="form-control") }}
+                    <div class="grid-container">
+                        <div class="mb-3">
+                            {{ form.name.label(class="form-label", style="color: black;") }}
+                            {{ form.name(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.password_hash.label(class="form-label", style="color: black;") }}
+                            {{ form.password_hash(class="form-control") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label", style="color: black;") }}
+                            {{ form.username(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.password_hash2.label(class="form-label", style="color: black;") }}
+                            {{ form.password_hash2(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label", style="color: black;") }}
+                            {{ form.email(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.role.label(class="form-label", style="color: black;") }}
+                            {{ form.role(class="form-control") }}
+                        </div>
                     </div>
-
-                    <div class="mb-3">
-                        {{ form.username.label(class="form-label", style="color: black;") }}
-                        {{ form.username(class="form-control") }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.email.label(class="form-label", style="color: black;") }}
-                        {{ form.email(class="form-control") }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.password_hash.label(class="form-label", style="color: black;") }}
-                        {{ form.password_hash(class="form-control") }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.password_hash2.label(class="form-label", style="color: black;") }}
-                        {{ form.password_hash2(class="form-control") }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.role.label(class="form-label", style="color: black;") }}
-                        {{ form.role(class="form-control") }}
-                    </div>
-
                     <div class="d-flex justify-content-center">
                         {{ form.submit(class="btn btn-primary btn-block", style="height: 70px; width: 120px; font-size: 1.5em;") }}
                     </div>
