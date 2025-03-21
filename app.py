@@ -245,32 +245,24 @@ def home2():
         return render_template('home.html')
 
 
-@app.route('/calendar-data')
+@app.route('/calendar-data', methods=['GET'])
 @login_required
 def calendar_data():
-    if session.get('username'):
-        user = Users.query.filter_by(username=session['username']).first()
-        if user.role == 'Employee':
-            shifts = Shifts.query.filter_by(user_id=user.id).all()
-            return render_template('plan.html', shifts=shifts)
+    if current_user.role != 'employee':
+        flash("Access Denied: Only employees can view this page.")
+        return redirect(url_for('dashboard'))
+    
+    if current_user.company:
+        shifts = Shifts.query.join(Users).filter(Users.company_id == current_user.company.id).all()
     else:
-        flash("Please log in to access this page.")
-        return redirect(url_for('login'))
+        shifts = Shifts.query.filter_by(user_id=current_user.id).all()
 
-@app.route('/calendar-data-all')
-@login_required
-def calendar_data_all():
-    if session.get('username'):
-        user = Users.query.filter_by(username=session['username']).first()
-        if user.role == 'Manager':
-            shifts = Shifts.query.all()
-            return render_template('plan_all.html', shifts=shifts)
-        else:
-            flash("Access Denied: Only managers can view this page.")
-            return redirect(url_for('home'))
-    else:
-        flash("Please log in to access this page.")
-        return redirect(url_for('login'))
+    for shift in shifts:
+        shift.date = datetime.strptime(shift.date, '%Y-%m-%d')
+
+    today = datetime.now()
+    calendar_days = [today + timedelta(days=i) for i in range(7)]  # Generate the next 7 days
+    return render_template('calendar_data.html', shifts=shifts, calendar_days=calendar_days)
 
 @app.route('/shift/add', methods=['GET', 'POST'])
 @login_required
