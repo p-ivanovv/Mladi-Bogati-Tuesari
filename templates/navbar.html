@@ -15,38 +15,67 @@
         <span class="link-text" style="color: white;">Bobche</span>
       </a>
     </li>
-    <li class="navbar-item flexbox-left">
-      <a class="navbar-item-inner flexbox-left">
-        <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="search-outline"></ion-icon>
-        </div>
-        <span class="link-text">Search</span>
-      </a>
-    </li>
-    <li class="navbar-item flexbox-left">
-      <a class="navbar-item-inner flexbox-left" href="{{ url_for('requests') }}">
-        <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="home-outline"></ion-icon>
-        </div>
-        <span class="link-text">Home</span>
-      </a>
-    </li>
+    {% if request.endpoint != 'add_shift' %}
     <li class="navbar-item flexbox-left">
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('add_shift') }}">
         <div class="navbar-item-inner-icon-wrapper flexbox">
           <ion-icon name="add-outline"></ion-icon>
         </div>
-        <span class="link-text">Add Post</span>
+        <span class="link-text">Add Shift</span>
       </a>
     </li>
+    {% endif %}
+    {% if request.endpoint != 'set_day_override' %}
     <li class="navbar-item flexbox-left">
-      <a class="navbar-item-inner flexbox-left" href="{{ url_for('add_shift') }}">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('set_day_override') }}">
         <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="heart-outline"></ion-icon>
+          <ion-icon name="calendar-outline"></ion-icon>
         </div>
-        <span class="link-text">Wishlist</span>
+        <span class="link-text">Set Day Override</span>
       </a>
     </li>
+    {% endif %}
+    {% if request.endpoint != 'set_shift_template' %}
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('set_shift_template') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="document-text-outline"></ion-icon>
+        </div>
+        <span class="link-text">Set Shift Template</span>
+      </a>
+    </li>
+    {% endif %}
+    {% if request.endpoint != 'view_day_overrides' %}
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('view_day_overrides') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="eye-outline"></ion-icon>
+        </div>
+        <span class="link-text">View Day Override</span>
+      </a>
+    </li>
+    {% endif %}
+    {% if request.endpoint != 'view_shift_templates' %}
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('view_shift_templates') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="layers-outline"></ion-icon>
+        </div>
+        <span class="link-text">View Shift Template</span>
+      </a>
+    </li>
+    {% endif %}
+    {% if request.endpoint != 'requests' %}
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('requests') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="paper-plane-outline"></ion-icon>
+        </div>
+        <span class="link-text">View My Requests</span>
+      </a>
+    </li>
+    {% endif %}
+    {% if request.endpoint != 'dashboard' %}
     <li class="navbar-item flexbox-left">
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('dashboard') }}">
         <div class="navbar-item-inner-icon-wrapper flexbox">
@@ -55,6 +84,9 @@
         <span class="link-text">Dashboard</span>
       </a>
     </li>
+    {% endif %}
+  </ul>
+  <ul class="navbar-items flexbox-col">
     <li class="navbar-item flexbox-left">
       {% if current_user.is_authenticated %}
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('logout') }}">
