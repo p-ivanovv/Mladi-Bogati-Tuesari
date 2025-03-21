@@ -58,8 +58,15 @@
     </div>
 {% endif %}
 
+{% if current_user.role == 'manager' %}
 <div style="text-align: center; margin-top: 20px;">
     <a href="{{ url_for('add_shift') }}" class="btn btn-primary">Add Shift</a>
 </div>
+{% else %}
+<div style="text-align: center; margin-top: 20px;">
+	<a href="{{ url_for('calendar_data') }}" class="btn btn-primary">Veiw Shifts</a>
+
+{% endif %}
+
 
 {% endblock %}
