@@ -19,9 +19,9 @@
     <li class="navbar-item flexbox-left">
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('add_shift') }}">
         <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="add-outline"></ion-icon>
+          <ion-icon name="add-outline" style="color: #1845ad;"></ion-icon>
         </div>
-        <span class="link-text">Add Shift</span>
+        <span class="link-text" style="color: #1845ad;">Add Shift</span>
       </a>
     </li>
     {% endif %}
@@ -29,9 +29,9 @@
     <li class="navbar-item flexbox-left">
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('set_day_override') }}">
         <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="calendar-outline"></ion-icon>
+          <ion-icon name="calendar-outline" style="color: #1845ad;"></ion-icon>
         </div>
-        <span class="link-text">Set Day Override</span>
+        <span class="link-text" style="color: #1845ad;">Set Day Override</span>
       </a>
     </li>
     {% endif %}
@@ -39,9 +39,9 @@
     <li class="navbar-item flexbox-left">
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('set_shift_template') }}">
         <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="document-text-outline"></ion-icon>
+          <ion-icon name="document-text-outline" style="color: #1845ad;"></ion-icon>
         </div>
-        <span class="link-text">Set Shift Template</span>
+        <span class="link-text" style="color: #1845ad;">Set Shift Template</span>
       </a>
     </li>
     {% endif %}
@@ -49,9 +49,9 @@
     <li class="navbar-item flexbox-left">
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('view_day_overrides') }}">
         <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="eye-outline"></ion-icon>
+          <ion-icon name="eye-outline" style="color: #ff512f;"></ion-icon>
         </div>
-        <span class="link-text">View Day Override</span>
+        <span class="link-text" style="color: #ff512f;">View Day Override</span>
       </a>
     </li>
     {% endif %}
@@ -59,9 +59,9 @@
     <li class="navbar-item flexbox-left">
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('view_shift_templates') }}">
         <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="layers-outline"></ion-icon>
+          <ion-icon name="layers-outline" style="color: #ff512f;"></ion-icon>
         </div>
-        <span class="link-text">View Shift Template</span>
+        <span class="link-text" style="color: #ff512f;">View Shift Template</span>
       </a>
     </li>
     {% endif %}
@@ -69,9 +69,9 @@
     <li class="navbar-item flexbox-left">
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('requests') }}">
         <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="paper-plane-outline"></ion-icon>
+          <ion-icon name="paper-plane-outline" style="color: #ff512f;"></ion-icon>
         </div>
-        <span class="link-text">View My Requests</span>
+        <span class="link-text" style="color: #ff512f;">View My Requests</span>
       </a>
     </li>
     {% endif %}
@@ -79,9 +79,9 @@
     <li class="navbar-item flexbox-left">
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('dashboard') }}">
         <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="pie-chart-outline"></ion-icon>
+          <ion-icon name="pie-chart-outline" style="color: #ff512f;"></ion-icon>
         </div>
-        <span class="link-text">Dashboard</span>
+        <span class="link-text" style="color: #ff512f;">Dashboard</span>
       </a>
     </li>
     {% endif %}
@@ -91,16 +91,16 @@
       {% if current_user.is_authenticated %}
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('logout') }}">
         <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="log-out-outline"></ion-icon>
+          <ion-icon name="log-out-outline" style="color: #ff512f;"></ion-icon>
         </div>
-        <span class="link-text">Logout</span>
+        <span class="link-text" style="color: #ff512f;">Logout</span>
       </a>
       {% else %}
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('login') }}">
         <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="log-in-outline"></ion-icon>
+          <ion-icon name="log-in-outline" style="color: #ff512f;"></ion-icon>
         </div>
-        <span class="link-text">Login</span>
+        <span class="link-text" style="color: #ff512f;">Login</span>
       </a>
       {% endif %}
     </li>
