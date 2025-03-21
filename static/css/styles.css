@@ -97,9 +97,7 @@ body, html {
     color: #37434d;
 }
 
-.header-blue .navbar .dropdown-menu .dropdown-item:focus, .header-blue .navbar .dropdown-menu .dropdown-item:hover {
-    background: #ebeff1;
-}
+
 
 .header-blue .action-button, .header-blue .action-button:not(.disabled):active {
     border: 1px solid rgba(255, 18, 18, 0.7);

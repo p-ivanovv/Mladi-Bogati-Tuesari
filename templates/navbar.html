@@ -8,8 +8,9 @@
 
 </head>
 <body>
-<nav id="navbar">
+<nav id="navbar" style="background: rgba(0, 0, 0, 0.83);">
   <ul class="navbar-items flexbox-col">
+<<<<<<< HEAD
     <li class="navbar-logo flexbox-left">
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('login') }}">
         <span class="link-text" style="color: white;">Bobche</span>
@@ -111,6 +112,77 @@
         </li>
         {% endif %}
       {% endif %}
+=======
+    {% if request.endpoint != 'add_shift' %}
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('add_shift') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="add-outline" style="color: #1845ad;"></ion-icon>
+        </div>
+        <span class="link-text" style="color: #1845ad;">Add Shift</span>
+      </a>
+    </li>
+    {% endif %}
+    {% if request.endpoint != 'set_day_override' %}
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('set_day_override') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="calendar-outline" style="color: #1845ad;"></ion-icon>
+        </div>
+        <span class="link-text" style="color: #1845ad;">Set Day Override</span>
+      </a>
+    </li>
+    {% endif %}
+    {% if request.endpoint != 'set_shift_template' %}
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('set_shift_template') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="document-text-outline" style="color: #1845ad;"></ion-icon>
+        </div>
+        <span class="link-text" style="color: #1845ad;">Set Shift Template</span>
+      </a>
+    </li>
+    {% endif %}
+    {% if request.endpoint != 'view_day_overrides' %}
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('view_day_overrides') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="eye-outline" style="color: #ff512f;"></ion-icon>
+        </div>
+        <span class="link-text" style="color: #ff512f;">View Day Override</span>
+      </a>
+    </li>
+    {% endif %}
+    {% if request.endpoint != 'view_shift_templates' %}
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('view_shift_templates') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="layers-outline" style="color: #ff512f;"></ion-icon>
+        </div>
+        <span class="link-text" style="color: #ff512f;">View Shift Template</span>
+      </a>
+    </li>
+    {% endif %}
+    {% if request.endpoint != 'requests' %}
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('requests') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="paper-plane-outline" style="color: #ff512f;"></ion-icon>
+        </div>
+        <span class="link-text" style="color: #ff512f;">View My Requests</span>
+      </a>
+    </li>
+    {% endif %}
+    {% if request.endpoint != 'dashboard' %}
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('dashboard') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="pie-chart-outline" style="color: #ff512f;"></ion-icon>
+        </div>
+        <span class="link-text" style="color: #ff512f;">Dashboard</span>
+      </a>
+    </li>
+>>>>>>> 3ed0019528240a6dc907ed3aa189072d14f35190
     {% endif %}
   </ul>
   <ul class="navbar-items flexbox-col">
