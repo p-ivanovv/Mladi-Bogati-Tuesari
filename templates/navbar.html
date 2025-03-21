@@ -8,13 +8,8 @@
 
 </head>
 <body>
-<nav id="navbar">
+<nav id="navbar" style="background: rgba(0, 0, 0, 0.83);">
   <ul class="navbar-items flexbox-col">
-    <li class="navbar-logo flexbox-left">
-      <a class="navbar-item-inner flexbox-left" href="{{ url_for('login') }}">
-        <span class="link-text" style="color: white;">Bobche</span>
-      </a>
-    </li>
     {% if request.endpoint != 'add_shift' %}
     <li class="navbar-item flexbox-left">
       <a class="navbar-item-inner flexbox-left" href="{{ url_for('add_shift') }}">
