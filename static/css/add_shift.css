@@ -39,7 +39,7 @@ input, select {
     padding: 10px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.07);
+    background-color: rgba(255, 255, 255, 0.1); /* Darker background */
     color: #ffffff;
 }
 
@@ -99,7 +99,8 @@ button:hover {
     border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 10px;
     text-align: center;
-    background-color: rgba(255, 255, 255, 0.07);
+    background-color: rgba(200, 200, 200, 0.4); /* Slightly darker gray, transparent */
+    backdrop-filter: blur(5px); /* Blurred */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
