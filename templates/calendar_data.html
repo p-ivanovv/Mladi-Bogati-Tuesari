@@ -43,6 +43,10 @@
         <h1>Your Shift Calendar</h1>
         <a href="{{ url_for('dashboard') }}" class="btn btn-secondary" style="display: block; text-align: center; margin-bottom: 20px;">Go Home</a>
 
+        <button class="kalendarcho-button">
+            <img src="{{ url_for('static', filename='images/kalendarcho.png') }}" alt="Kalendarcho">
+        </button>
+
         <div class="calendar">
             {% for day in calendar_days %}
                 <div class="day">
