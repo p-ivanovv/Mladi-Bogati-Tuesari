@@ -119,3 +119,55 @@ button:hover {
     color: #ffffff;
 }
 
+.override-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.8); /* Dark background */
+    box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.override-container h1 {
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    color: #ffffff;
+}
+
+.override-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.override-form label {
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.override-form input,
+.override-form select {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.override-form button {
+    padding: 10px;
+    background-color: #ffffff;
+    color: #080710;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.override-form button:hover {
+    background-color: #D0B8A8;
+}
+

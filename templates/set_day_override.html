@@ -4,20 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Set Day Override</title>
-    <link rel="stylesheet" href="/static/css/set_day_override.css">
-    <style>
-        .form-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: calc(100vh - 60px); /* Adjust height based on navbar height */
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_shift.css') }}">
 </head>
-<body>
+<body style="background-color: #080710;"> <!-- Dark background -->
     {% include 'navbar.html' %}
-    <div class="form-container">
-        <form method="POST" action="/set_day_override">
+    <div class="override-container">
+        <h1>Set Day Override</h1>
+        <form class="override-form" method="POST" action="{{ url_for('set_day_override') }}">
             <label for="day">Day:</label>
             <select name="day" required>
                 <option value="Mon">Monday</option>
