@@ -19,7 +19,6 @@
     <div class="card-body">
         <p><strong>Name:</strong> {{ current_user.name }}</p>
         <p><strong>Username:</strong> {{ current_user.username }}</p>
-        <p><strong>User ID:</strong> {{ current_user.id }}</p>
         {% if current_user.role == 'manager' %}
             <p><strong>Role:</strong> Manager</p>
             {% if company %}

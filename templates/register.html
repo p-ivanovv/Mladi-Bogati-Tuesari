@@ -127,12 +127,7 @@
                 <div class="shape"></div>
                 <div class="shape"></div>
         </div>
-<<<<<<< HEAD
-        <form method="POST" action="{% url 'signup' %}" class="animate__animated animate__fadeIn">
-                {% csrf_token %}
-=======
         <form method="POST" action="{{ url_for('login')}}">
->>>>>>> b77e9126a3d733df49071fbb0a5e80872d9f89f2
                 <h3>Sign Up Here</h3>
 
                 <label for="username">Username</label>
@@ -147,10 +142,6 @@
                 <label for="confirm-password">Confirm Password</label>
                 <input type="password" placeholder="Confirm Password" id="confirm-password">
 
-<<<<<<< HEAD
-                <button type="submit">Sign Up</button>
-
-=======
                 <label for="role">Role</label>
                 <select id="role" name="role">
                     <option value="manager" style="color: gray;">Manager</option>
@@ -161,7 +152,6 @@
                 <input type="text" placeholder="Skill" id="skill" name="skill">
 
                 <button>Sign Up</button>
->>>>>>> b3fe1f49ee6891a628a9e61fed15c0045a1ded57
         </form>
 </body>
 </html>
