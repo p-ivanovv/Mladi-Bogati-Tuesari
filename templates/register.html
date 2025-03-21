@@ -124,6 +124,32 @@
         <div class="shape"></div>
         <div class="shape"></div>
     </div>
+<<<<<<< HEAD
+    <form method="POST">
+        {{ form.hidden_tag() }} <!-- Include CSRF token -->
+        <h3>Sign Up Here</h3>
+
+        <label for="username">Username</label>
+        <input type="text" placeholder="Username" id="username" name="username">
+
+        <label for="email">Email</label>
+        <input type="email" placeholder="Email" id="email" name="email">
+
+        <label for="password">Password</label>
+        <input type="password" placeholder="Password" id="password" name="password_hash">
+
+        <label for="confirm-password">Confirm Password</label>
+        <input type="password" placeholder="Confirm Password" id="confirm-password" name="password_hash2">
+
+        <label for="role">Role</label>
+        <select id="role" name="role">
+            <option value="manager" style="color: gray;">Manager</option>
+            <option value="employee" style="color: gray;">Employee</option>
+        </select>
+
+        <label for="skill">Skill</label>
+        <input type="text" placeholder="Skill" id="skill" name="skill">
+=======
     <form method="POST" action="{{ url_for('register') }}">
         <h3>Sign Up Here</h3>
 
@@ -147,6 +173,7 @@
 
         <label for="skill">Skill</label>
         <input type="text" placeholder="Skill (optional)" id="skill" name="skill">
+>>>>>>> b374203b401aab77a7b620599ea4f0040086c5f7
 
         <button type="submit">Sign Up</button>
     </form>
