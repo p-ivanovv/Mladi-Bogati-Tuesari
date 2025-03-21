@@ -421,12 +421,18 @@ def delete_shift(shift_id):
 
 @app.route('/view_shift_templates')
 def view_shift_templates():
+    if current_user.role != 'manager': 
+        flash("Access Denied: Only managers can set shift templates.")
+        return redirect(url_for('home'))
     shift_templates = ShiftTemplate.query.all()
     return render_template('view_shift_templates.html', shift_templates=shift_templates)
 
 
 @app.route('/set_shift_template', methods=['GET', 'POST'])
 def set_shift_template():
+    if current_user.role != 'manager': 
+        flash("Access Denied: Only managers can set shift templates.")
+        return redirect(url_for('home'))
     if request.method == 'POST':
         day_type = request.form['day_type']
         start_time = datetime.strptime(request.form['start_time'], '%H:%M').time()
@@ -450,11 +456,17 @@ def set_shift_template():
 
 @app.route('/view_day_overrides')
 def view_day_overrides():
+    if current_user.role != 'manager': 
+        flash("Access Denied: Only managers can set day overrides.")
+        return redirect(url_for('home'))
     day_overrides = DaySpecificOverride.query.all()
     return render_template('view_day_overrides.html', day_overrides=day_overrides)
 
 @app.route('/set_day_override', methods=['GET', 'POST'])
 def set_day_override():
+    if current_user.role != 'manager': 
+        flash("Access Denied: Only managers can set day overrides.")
+        return redirect(url_for('home'))
     if request.method == 'POST':
         day = request.form['day']
         start_time = datetime.strptime(request.form['start_time'], '%H:%M').time()
@@ -714,7 +726,10 @@ def generate_schedule(works_on_weekends):
 @app.route('/generate_schedule', methods=['GET', 'POST'])
 def generate_schedule_route(works_on_weekends):
     schedule = generate_schedule(works_on_weekends)
-
+    if current_user.role != 'manager': 
+        flash("Access Denied: Only managers can generate schedule.")
+        return redirect(url_for('home'))
+    
     if not schedule:
         flash("No feasible schedule could be generated. Please adjust the constraints or input data.", "error")
     else:
@@ -737,6 +752,9 @@ def generate_schedule_route(works_on_weekends):
 
 @app.route('/view_schedule')
 def view_schedule():
+    if current_user.role != 'manager': 
+        flash("Access Denied: Only managers can view schedule.")
+        return redirect(url_for('home'))
     shifts = Shifts.query.options(joinedload(Shifts.user)).all()
     return render_template('schedule.html', shifts=shifts)
 
