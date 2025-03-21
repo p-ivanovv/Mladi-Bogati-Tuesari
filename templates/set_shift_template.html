@@ -2,26 +2,36 @@
 <html lang="en">
 <head>
     <link rel="stylesheet" href="/static/css/set_day_override.css">
+    <style>
+        .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 60px); /* Adjust height based on navbar height */
+        }
+    </style>
 </head>
 <body>
     {% include 'navbar.html' %}
-    <form method="POST">
-        <label for="day_type">Day Type:</label>
-        <input type="text" name="day_type" id="day_type" required>
+    <div class="form-container">
+        <form method="POST">
+            <label for="day_type">Day Type:</label>
+            <input type="text" name="day_type" id="day_type" required>
 
-        <label for="start_time">Start Time:</label>
-        <input type="time" name="start_time" id="start_time" required>
+            <label for="start_time">Start Time:</label>
+            <input type="time" name="start_time" id="start_time" required>
 
-        <label for="end_time">End Time:</label>
-        <input type="time" name="end_time" id="end_time" required>
+            <label for="end_time">End Time:</label>
+            <input type="time" name="end_time" id="end_time" required>
 
-        <label for="skill">Skill:</label> <!-- Changed from 'role' to 'skill' -->
-        <input type="text" name="skill" id="skill" required>
+            <label for="skill">Skill:</label> <!-- Changed from 'role' to 'skill' -->
+            <input type="text" name="skill" id="skill" required>
 
-        <label for="required_employees">Required Employees:</label>
-        <input type="number" name="required_employees" id="required_employees" required>
+            <label for="required_employees">Required Employees:</label>
+            <input type="number" name="required_employees" id="required_employees" required>
 
-        <button type="submit">Submit</button>
-    </form>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
 </body>
 </html>
