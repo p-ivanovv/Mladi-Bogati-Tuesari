@@ -1,23 +1,83 @@
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<details class="taskbar">
-    <summary></summary>
-    <nav class="menu">
-        <a href="{{ url_for('home') }}">Home</a>
-        {% if current_user.role == 'manager' %}
-            <a href="{{ url_for('add_shift') }}">Shifts</a>
-        {% else %}
-            <a href="{{ url_for('calendar_data') }}">Shifts</a>
-        {% endif %}
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - Sticky responsive sidenav</title>
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Material+Icons+Round'><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-        <a href="{{ url_for('dashboard') }}">Dashboard</a>
-        {% if not current_user.is_authenticated %}
-            {% if request.endpoint == 'register' %}
-                <a href="{{ url_for('login') }}">Login</a>
-            {% elif request.endpoint == 'login' %}
-                <a href="{{ url_for('register') }}">Register</a>
-            {% endif %}
-        {% else %}
-            <a href="{{ url_for('logout') }}">Logout</a>
-        {% endif %}
-    </nav>
-</details>
+</head>
+<body>
+<nav id="navbar">
+  <ul class="navbar-items flexbox-col">
+    <li class="navbar-logo flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('login') }}">
+        <span class="link-text" style="color: white;">Bobche</span>
+      </a>
+    </li>
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="search-outline"></ion-icon>
+        </div>
+        <span class="link-text">Search</span>
+      </a>
+    </li>
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('requests') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="home-outline"></ion-icon>
+        </div>
+        <span class="link-text">Home</span>
+      </a>
+    </li>
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('add_shift') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="add-outline"></ion-icon>
+        </div>
+        <span class="link-text">Add Post</span>
+      </a>
+    </li>
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('add_shift') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="heart-outline"></ion-icon>
+        </div>
+        <span class="link-text">Wishlist</span>
+      </a>
+    </li>
+    <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('dashboard') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="pie-chart-outline"></ion-icon>
+        </div>
+        <span class="link-text">Dashboard</span>
+      </a>
+    </li>
+    <li class="navbar-item flexbox-left">
+      {% if current_user.is_authenticated %}
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('logout') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="log-out-outline"></ion-icon>
+        </div>
+        <span class="link-text">Logout</span>
+      </a>
+      {% else %}
+      <a class="navbar-item-inner flexbox-left" href="{{ url_for('login') }}">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
+          <ion-icon name="log-in-outline"></ion-icon>
+        </div>
+        <span class="link-text">Login</span>
+      </a>
+      {% endif %}
+    </li>
+  </ul>
+</nav>
+
+
+<!-- partial -->
+  <script src='https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js'></script>
+<script src='https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js'></script>
+</body>
+</html>
