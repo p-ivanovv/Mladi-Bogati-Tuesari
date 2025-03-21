@@ -4,17 +4,25 @@
             <th>Date</th>
             <th>Day</th>
             <th>Start Time</th>
+            <th>End Time</th>
             <th>Employee</th>
         </tr>
     </thead>
     <tbody>
-        {% for shift in shifts %}
-        <tr>
-            <td>{{ shift.date }}</td>
-            <td>{{ shift.day }}</td>
-            <td>{{ shift.start_time }}</td>
-            <td>{{ shift.user.name }}</td>
-        </tr>
-        {% endfor %}
+        {% if shifts %}
+            {% for shift in shifts %}
+            <tr>
+                <td>{{ shift.date }}</td>
+                <td>{{ shift.day }}</td>
+                <td>{{ shift.start_time }}</td>
+                <td>{{ shift.end_time }}</td>
+                <td>{{ shift.user.name }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="5">No shifts available.</td>
+            </tr>
+        {% endif %}
     </tbody>
 </table>
