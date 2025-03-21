@@ -129,18 +129,17 @@
         </div>
         <form method="POST" action="{{ url_for('login')}}" class="animate__animated animate__fadeIn">
                 <h3>Sign Up Here</h3>
-
                 <label for="username">Username</label>
-                <input type="text" placeholder="Username" id="username">
+                <input type="text" placeholder="Username" id="username" name="username">
 
                 <label for="email">Email</label>
-                <input type="email" placeholder="Email" id="email">
+                <input type="email" placeholder="Email" id="email" name="email">
 
                 <label for="password">Password</label>
-                <input type="password" placeholder="Password" id="password">
+                <input type="password" placeholder="Password" id="password" name="password">
 
                 <label for="confirm-password">Confirm Password</label>
-                <input type="password" placeholder="Confirm Password" id="confirm-password">
+                <input type="password" placeholder="Confirm Password" id="confirm-password" name="confirm_password">
 
                 <label for="role">Role</label>
                 <select id="role" name="role">
