@@ -7,21 +7,15 @@ body {
   background-color: var(--primColor);
   font-family: Arial, Helvetica, sans-serif;
   font-size: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-  text-align: center; /* Add this line */
 }
 details {
-  margin: 20px; /* Reduce margin */
+  margin: 40px;
   position: relative; /* Add this line */
 }
 summary {
   writing-mode: horizontal-tb;
   text-align: center;
-  padding: 6px 5px; /* Reduce padding */
+  padding: 12px 10px;
   width: 23px;
   height: 17px;
   background-color: var(--primColor);
@@ -51,15 +45,15 @@ details[open] .menu {
   animation-name: menuAnim;
 }
 
-details[open] summary::after {
+/*details[open] summary::after {
   content: "";
-}
+}*/
 .menu {
   height:   0;
   width: fit-content;
-  border-radius: var(--cornerRad);
+/*border-radius: var(--cornerRad);*/
   background-color: var(--primColor);
-  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px 0 rgba(177, 95, 95, 0.2);
   margin-top: 8px;
   display: flex;
   flex-direction: column;
@@ -114,17 +108,4 @@ details[open]::before {
     top: 0;
     width: 100%;
     z-index: 1000;
-}
-
-/* Adjust the width of the "User details" board */
-.user-details {
-  width: 450px; /* Adjust width */
-  padding: 10px; /* Adjust padding */
-}
-
-/* Center the container */
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
