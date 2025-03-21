@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container animate__animated animate__fadeIn" style="text-align: center;">
+<div class="container animate__animated animate__fadeIn" style="text-align: center; position: relative; z-index: 1;">
 
     <!-- Flash Messages (With Close Button) -->
     {% for message in get_flashed_messages() %}
@@ -15,7 +15,7 @@
     <br/>
 
     <!-- User Details -->
-    <div class="card user-details">
+    <div class="card user-details" style="width: 50%; margin: 0 auto;">
         <div class="card-header">User Details</div>
         <div class="card-body">
             <p><strong>Name:</strong> {{ current_user.name }}</p>
@@ -36,7 +36,7 @@
 
         <!-- Create Company -->
         {% if not company %}
-            <div class="card mt-4">
+            <div class="card mt-4" style="width: 50%; margin: 0 auto;">
                 <div class="card-header">Create a Company</div>
                 <div class="card-body">
                     <form method="POST">
@@ -52,7 +52,7 @@
             <h3>Company: {{ company.name }}</h3>
 
             <!-- Assign Employees -->
-            <div class="card mt-3">
+            <div class="card mt-3" style="width: 50%; margin: 0 auto;">
                 <div class="card-header">Assign Employees to Your Company</div>
                 <div class="card-body">
                     {% if employees %}
@@ -72,7 +72,7 @@
             </div>
 
             <!-- Current Employees -->
-            <div class="card mt-3">
+            <div class="card mt-3" style="width: 50%; margin: 0 auto;">
                 <div class="card-header">Current Employees in {{ company.name }}</div>
                 <div class="card-body">
                     {% if company.employees %}

@@ -625,95 +625,118 @@ def build_weekly_requirements(works_on_weekends):
 def generate_schedule(works_on_weekends):
     model = cp_model.CpModel()
 
+    # Fetch data from the database
     employees = Users.query.filter_by(role="employee").all()
     shift_templates = ShiftTemplate.query.all()
     day_overrides = DaySpecificOverride.query.all()
     approved_time_offs = TimeOffRequest.query.filter_by(status="Approved").all()
 
-    today = datetime.now()
-    day_to_date = {
-        day: (today + timedelta(days=i)).date()
-        for i, day in enumerate(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
-    }
+    # Debugging: Log input data
+    print("Employees:", [(emp.id, emp.username, emp.skill) for emp in employees])
+    print("Shift Templates:", [(t.day_type, t.start_time, t.end_time, t.skill, t.required_employees) for t in shift_templates])
+    print("Day Overrides:", [(o.day, o.start_time, o.end_time, o.skill, o.required_employees) for o in day_overrides])
 
-    employee_ids = [emp.id for emp in employees]
-    employee_skills = {emp.id: emp.skill for emp in employees}
-
-    time_off_map = {emp.id: [] for emp in employees}
-    for request in approved_time_offs:
-        time_off_map[request.user_id].append((request.start_date, request.end_date))
-
-    shifts_needed = {"weekday": {}, "weekend": {}}
-
+    # Map abbreviated day names to full day names
     day_name_map = {
         "Mon": "Monday", "Tue": "Tuesday", "Wed": "Wednesday",
         "Thu": "Thursday", "Fri": "Friday", "Sat": "Saturday", "Sun": "Sunday"
     }
 
+    # Create a mapping from full day names to dates
+    today = datetime.now()
+    day_to_date = {
+        full_day: (today + timedelta(days=i)).date()
+        for i, full_day in enumerate(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+    }
+
+    # Initialize employee data
+    employee_ids = [emp.id for emp in employees]
+    employee_skills = {emp.id: emp.skill for emp in employees}
+
+    # Map approved time-off requests
+    time_off_map = {emp.id: [] for emp in employees}
+    for request in approved_time_offs:
+        time_off_map[request.user_id].append((request.start_date, request.end_date))
+
+    # Build shifts needed based on templates and overrides
+    shifts_needed = {}
     for template in shift_templates:
-        if template.day_type == "Weekday":
-            for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]:
-                key = (day, template.start_time, template.end_time, template.skill)
-                shifts_needed["weekday"][key] = template.required_employees
-        elif works_on_weekends and template.day_type == "Weekend":
-            for day in ["Saturday", "Sunday"]:
-                key = (day, template.start_time, template.end_time, template.skill)
-                shifts_needed["weekend"][key] = template.required_employees
+        day_range = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] if template.day_type == "Weekday" else ["Saturday", "Sunday"]
+        for day in day_range:
+            if template.day_type == "Weekend" and not works_on_weekends:
+                continue
+            key = (day, template.start_time, template.end_time, template.skill)
+            shifts_needed[key] = template.required_employees
 
     for override in day_overrides:
+        # Normalize day names
         full_day_name = day_name_map.get(override.day, override.day)
-        override_key = (full_day_name, override.start_time, override.end_time, override.skill)
-        if full_day_name in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]:
-            shifts_needed["weekday"].setdefault(override_key, 0)
-            shifts_needed["weekday"][override_key] += override.required_employees
-        elif works_on_weekends and full_day_name in ["Saturday", "Sunday"]:
-            shifts_needed["weekend"].setdefault(override_key, 0)
-            shifts_needed["weekend"][override_key] += override.required_employees
+        key = (full_day_name, override.start_time, override.end_time, override.skill)
+        shifts_needed[key] = override.required_employees
 
+    # Debugging: Log shifts needed
+    print("Shifts Needed After Overrides:", shifts_needed)
+
+    # Create variables and constraints
     employee_shifts = {}
-    total_shifts = {emp_id: model.NewIntVar(0, len(shifts_needed["weekday"]) + len(shifts_needed["weekend"]), f"total_shifts_{emp_id}") for emp_id in employee_ids}
-
     for emp_id in employee_ids:
-        for (day_name, start_time, end_time, skill) in shifts_needed["weekday"]:
-            employee_shifts[(emp_id, day_name, start_time, end_time, skill)] = model.NewBoolVar(
-                f"emp_{emp_id}_day_{day_name}_{start_time}_{end_time}_{skill}"
+        for (day, start_time, end_time, skill), required_employees in shifts_needed.items():
+            if employee_skills[emp_id] != skill:
+                continue
+            if any(start_date <= day_to_date[day] <= end_date for start_date, end_date in time_off_map[emp_id]):
+                continue
+            employee_shifts[(emp_id, day, start_time, end_time, skill)] = model.NewBoolVar(
+                f"emp_{emp_id}_{day}_{start_time}_{end_time}_{skill}"
             )
 
-    for (day_name, start_time, end_time, skill), num_employees in shifts_needed["weekday"].items():
+    # Add staffing constraints
+    for (day, start_time, end_time, skill), required_employees in shifts_needed.items():
+        eligible_employees = [
+            emp_id for emp_id in employee_ids
+            if (emp_id, day, start_time, end_time, skill) in employee_shifts
+        ]
+        if len(eligible_employees) < required_employees:
+            print(f"Not enough eligible employees for {day}, {start_time}-{end_time}, Skill: {skill}")
+            continue
         model.Add(
-            sum(
-                employee_shifts[(emp_id, day_name, start_time, end_time, skill)]
-                for emp_id in employee_ids
-                if employee_skills[emp_id] == skill and not any(
-                    start_date <= day_to_date[day_name] <= end_date for start_date, end_date in time_off_map[emp_id]
-                )
-            )
-            >= num_employees
+            sum(employee_shifts[(emp_id, day, start_time, end_time, skill)] for emp_id in eligible_employees) >= required_employees
         )
+        print(f"Added staffing constraint for {day}, {start_time}-{end_time}, Skill: {skill}, Required: {required_employees}")
 
-    model.AddMaxEquality(
-        max_shifts := model.NewIntVar(0, len(shifts_needed["weekday"]) + len(shifts_needed["weekend"]), "max_shifts"),
-        [total_shifts[emp_id] for emp_id in employee_ids]
-    )
-    model.AddMinEquality(
-        min_shifts := model.NewIntVar(0, len(shifts_needed["weekday"]) + len(shifts_needed["weekend"]), "min_shifts"),
-        [total_shifts[emp_id] for emp_id in employee_ids]
-    )
+    # Add fairness constraints (optional)
+    total_shifts = {emp_id: model.NewIntVar(0, len(shifts_needed), f"total_shifts_{emp_id}") for emp_id in employee_ids}
+    for emp_id in employee_ids:
+        model.Add(
+            total_shifts[emp_id] == sum(
+                employee_shifts[(emp_id, day, start_time, end_time, skill)]
+                for (day, start_time, end_time, skill) in shifts_needed
+                if (emp_id, day, start_time, end_time, skill) in employee_shifts
+            )
+        )
+    max_shifts = model.NewIntVar(0, len(shifts_needed), "max_shifts")
+    min_shifts = model.NewIntVar(0, len(shifts_needed), "min_shifts")
+    model.AddMaxEquality(max_shifts, [total_shifts[emp_id] for emp_id in employee_ids])
+    model.AddMinEquality(min_shifts, [total_shifts[emp_id] for emp_id in employee_ids])
     model.Add(max_shifts - min_shifts <= 1)
 
+    # Solve the model
     solver = cp_model.CpSolver()
     status = solver.Solve(model)
 
     if status in (cp_model.FEASIBLE, cp_model.OPTIMAL):
+        print("Solution Found")
         schedule = {}
         for emp_id in employee_ids:
-            for (day_name, start_time, end_time, skill) in shifts_needed["weekday"]:
-                if solver.Value(employee_shifts[(emp_id, day_name, start_time, end_time, skill)]) == 1:
-                    date = day_to_date[day_name]
-                    schedule.setdefault((date, day_name, start_time, skill), []).append(emp_id)
+            for (day, start_time, end_time, skill), _ in shifts_needed.items():
+                if (emp_id, day, start_time, end_time, skill) in employee_shifts and solver.Value(employee_shifts[(emp_id, day, start_time, end_time, skill)]) == 1:
+                    date = day_to_date[day]
+                    schedule.setdefault((date, day, start_time, end_time, skill), []).append(emp_id)
         return schedule
     else:
+        print(f"Solver failed with status: {solver.StatusName(status)}")
         return None
+
+
     
 @app.route('/generate_schedule', methods=['GET', 'POST'])
 @login_required
@@ -729,29 +752,57 @@ def generate_schedule_route():
 
     if not schedule:
         flash("No feasible schedule could be generated.", "error")
+        print("No feasible schedule could be generated.")  # Debugging
         return redirect('/view_schedule')
 
-    today = datetime.now()
-    try:
-        for (date, day, start_time, skill), employee_ids in schedule.items():
-            for emp_id in employee_ids:
-                end_time = ShiftTemplate.query.filter_by(start_time=start_time, skill=skill).first().end_time.strftime('%H:%M')
+    print("Generated Schedule:", schedule)  # Debugging
 
+    try:
+        for (date, day, start_time, end_time, skill), employee_ids in schedule.items():
+            for emp_id in employee_ids:
+                # Format `start_time` and `end_time` as strings
+                if isinstance(start_time, datetime.time):
+                    start_time_str = start_time.strftime('%H:%M')
+                elif isinstance(start_time, str):  # If already a string, use as-is
+                    start_time_str = start_time
+                else:
+                    raise ValueError(f"Invalid start_time type: {type(start_time)}")
+
+                if isinstance(end_time, datetime.time):
+                    end_time_str = end_time.strftime('%H:%M')
+                elif isinstance(end_time, str):  # If already a string, use as-is
+                    end_time_str = end_time
+                else:
+                    raise ValueError(f"Invalid end_time type: {type(end_time)}")
+
+                # Format `date` as a string
+                if isinstance(date, datetime.date):
+                    date_str = date.strftime('%Y-%m-%d')
+                elif isinstance(date, str):  # If already a string, use as-is
+                    date_str = date
+                else:
+                    raise ValueError(f"Invalid date type: {type(date)}")
+
+                # Add the shift to the database
                 shift = Shifts(
-                    date=date.strftime('%Y-%m-%d'),
+                    date=date_str,  # Use formatted date
                     day=day,
-                    start_time=start_time,
-                    end_time=end_time,
+                    start_time=start_time_str,  # Use formatted start_time
+                    end_time=end_time_str,  # Use formatted end_time
                     user_id=emp_id,
                     skill=skill
                 )
                 db.session.add(shift)
+                print(f"Added shift: {shift}")  # Debugging
 
+        # Commit the changes to the database
         db.session.commit()
         flash("Schedule successfully generated!", "success")
+        print("Schedule successfully saved to the database.")  # Debugging
     except Exception as e:
         db.session.rollback()
         flash("An error occurred while saving the schedule.", "error")
+        print(f"Error saving schedule to database: {e}")  # Debugging
 
     return redirect('/view_schedule')
 
@@ -759,12 +810,10 @@ def generate_schedule_route():
 @login_required
 def view_schedule():
     if current_user.role != 'manager': 
-        flash("Access Denied: Only managers can view the schedule.")
-        return redirect(url_for('dashboard'))
-    
-    # Load shifts and ensure we fetch user data efficiently
+        flash("Access Denied: Only managers can view schedule.")
+        return redirect(url_for('home'))
     shifts = Shifts.query.options(joinedload(Shifts.user)).all()
-
+    print("Shifts:", shifts)  
     return render_template('schedule.html', shifts=shifts)
 
 if __name__ == '__main__':
