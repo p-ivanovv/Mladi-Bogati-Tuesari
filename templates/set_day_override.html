@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/static/css/set_day_override.css">
 </head>
 <body>
+    {% include 'navbar.html' %}
     <form method="POST" action="/set_day_override">
         <label for="day">Day:</label>
         <select name="day" required>
