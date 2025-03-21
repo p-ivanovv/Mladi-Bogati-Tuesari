@@ -263,18 +263,32 @@ def dashboard():
         company = Company.query.filter_by(manager_id=current_user.id).first()
 
         if request.method == 'POST':
+            # First, check if the manager is trying to create a company
+            company_name = request.form.get('company_name')
+            if company_name and not company:
+                company = Company(name=company_name, manager_id=current_user.id)
+                db.session.add(company)
+                db.session.commit()
+                flash(f"Company '{company_name}' created successfully!", "success")
+                return redirect(url_for('dashboard'))  # Refresh page
+
+            # If the manager is assigning an employee to the company
             employee_id = request.form.get('employee_id')
-            if employee_id:
+            if employee_id and company:
                 employee = Users.query.get(employee_id)
                 if employee:
                     employee.company_id = company.id
                     db.session.commit()
-                    flash(f"{employee.name} has been added to {company.name}!")
+                    flash(f"{employee.name} has been added to {company.name}!", "success")
+                else:
+                    flash("Invalid employee selected.", "danger")
+            elif employee_id and not company:
+                flash("Please create a company first before assigning employees.", "danger")
 
-        employees = Users.query.filter_by(company_id=None, role='employee').all()  # Unassigned employees
+        employees = Users.query.filter_by(company_id=None, role='employee').all()
 
     elif current_user.role == 'employee':
-        company = current_user.company  # Display company for employees
+        company = Company.query.get(current_user.company_id)
 
     return render_template('dashboard.html', company=company, employees=employees)
 
