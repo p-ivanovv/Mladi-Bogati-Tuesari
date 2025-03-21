@@ -68,7 +68,7 @@ class ShiftTemplate(db.Model):
     day_type = db.Column(db.String(20), nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
-    skill = db.Column(db.String(100), nullable=False)  # Changed from 'role' to 'skill'
+    skill = db.Column(db.String(100), nullable=False) 
     required_employees = db.Column(db.Integer, nullable=False)
 
 class DaySpecificOverride(db.Model):
@@ -77,7 +77,7 @@ class DaySpecificOverride(db.Model):
     day = db.Column(db.String(50), nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
-    skill = db.Column(db.String(100), nullable=False)  # Changed from 'role' to 'skill'
+    skill = db.Column(db.String(100), nullable=False)
     required_employees = db.Column(db.Integer, nullable=False)
 
 class CompanyConfig(db.Model):
@@ -309,10 +309,10 @@ def calendar_data():
         shifts = Shifts.query.filter_by(user_id=current_user.id).all()
 
     for shift in shifts:
-        shift.date = datetime.strptime(shift.date, '%Y-%m-%d')
+        shift.date = shift.date  
 
     today = datetime.now()
-    calendar_days = [today + timedelta(days=i) for i in range(7)]  # Generate the next 7 days
+    calendar_days = [today + timedelta(days=i) for i in range(7)] 
     return render_template('calendar_data.html', shifts=shifts, calendar_days=calendar_days)
 
 @app.route('/shift/add', methods=['GET', 'POST'])
@@ -322,12 +322,14 @@ def add_shift():
         flash("Access Denied: Only managers can add shifts.")
         return redirect(url_for('home'))
     if request.method == 'POST':
+        shift_id = request.form.get('shift_id')
         date = request.form.get('date')
         start_time = request.form.get('start_time')
         end_time = request.form.get('end_time')
         user_id = request.form.get('user_id')
+        day = datetime.strptime(date, '%Y-%m-%d').strftime('%A')
 
-        if date and start_time and end_time and user_id:
+        if date and start_time and end_time and user_id and day:
             shift_year = datetime.strptime(date, '%Y-%m-%d').year
             if shift_year != 2025:
                 flash("The year must be 2025.")
@@ -351,22 +353,24 @@ def add_shift():
                 flash("Shift overlaps with an existing shift for this employee.")
                 return redirect(url_for('add_shift'))
 
-            # Add the new shift
-            new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id)
+            new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id, day=day)
             db.session.add(new_shift)
+
+            if shift_id:
+                old_shift = Shifts.query.get(shift_id)
+                if old_shift:
+                    db.session.delete(old_shift)
+
             db.session.commit()
-            flash("Shift added successfully!")
+            flash("Shift updated successfully!" if shift_id else "Shift added successfully!")
             return redirect(url_for('add_shift'))
         else:
             flash("All fields are required!")
     users = Users.query.all()
     shifts = Shifts.query.all()
 
-    for shift in shifts:
-        shift.date = datetime.strptime(shift.date, '%Y-%m-%d')
-
     today = datetime.now()
-    calendar_days = [today + timedelta(days=i) for i in range(7)]  # Generate the next 7 days
+    calendar_days = [today + timedelta(days=i) for i in range(7)]
     return render_template('add_shift.html', users=users, shifts=shifts, calendar_days=calendar_days)
 
 @app.route('/shift/edit/<int:shift_id>', methods=['GET', 'POST'])
@@ -437,7 +441,7 @@ def set_shift_template():
         day_type = request.form['day_type']
         start_time = datetime.strptime(request.form['start_time'], '%H:%M').time()
         end_time = datetime.strptime(request.form['end_time'], '%H:%M').time()
-        skill = request.form['skill']  # Use 'skill' instead of 'role'
+        skill = request.form['skill']
         required_employees = int(request.form['required_employees'])
 
         new_template = ShiftTemplate(

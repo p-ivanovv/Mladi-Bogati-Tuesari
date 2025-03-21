@@ -50,7 +50,7 @@
                 <strong>{{ day.strftime('%A') }}</strong><br>
                 <span>{{ day.strftime('%d %B') }}</span>
                 {% for shift in shifts %}
-                    {% if shift.date.date() == day.date() %}
+                    {% if shift.date == day.strftime('%Y-%m-%d') %}
                         <div class="shift" data-id="{{ shift.id }}" data-date="{{ shift.date }}" data-start="{{ shift.start_time }}" data-end="{{ shift.end_time }}" data-user="{{ shift.user.id }}">
                             <strong>{{ shift.user.name }}</strong><br>
                             {{ shift.start_time }} - {{ shift.end_time }}
@@ -75,7 +75,7 @@
         btn.onclick = function() {
             modal.style.display = "block";
             modalTitle.innerText = "Add Shift";
-            shiftIdInput.value = "";
+            shiftIdInput.value = "";  // Clear shift ID for new shifts
             dateInput.value = "";
             startTimeInput.value = "";
             endTimeInput.value = "";
@@ -97,7 +97,7 @@
             shift.addEventListener("click", function() {
                 modal.style.display = "block";
                 modalTitle.innerText = "Edit Shift";
-                shiftIdInput.value = this.getAttribute("data-id");
+                shiftIdInput.value = this.getAttribute("data-id");  // Set shift ID for editing
                 dateInput.value = this.getAttribute("data-date");
                 startTimeInput.value = this.getAttribute("data-start");
                 endTimeInput.value = this.getAttribute("data-end");
