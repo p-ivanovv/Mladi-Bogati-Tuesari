@@ -182,41 +182,48 @@ def delete(id):
 		flash("Sorry, you can't delete that user! ")
 		return redirect(url_for('dashboard'))
 
-@app.route('/user/add', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    name = None
-    form = UserForm()
-    if form.validate_on_submit():
-        print("Form validated successfully.")  # Debugging
-        user = Users.query.filter_by(email=form.email.data).first()
-        if user is None:
-            try:
-                hashed_pw = generate_password_hash(form.password_hash.data)
-                user = Users(
-                    username=form.username.data,
-                    name=form.name.data,
-                    email=form.email.data,
-                    password_hash=hashed_pw,
-                    role=form.role.data,
-                    skill=form.skill.data
-                )
-                db.session.add(user)
-                db.session.commit()
-                print(f"User {user.username} added successfully.")  # Debugging
-                flash("User Added Successfully")
-                return redirect(url_for('login'))
-            except Exception as e:
-                db.session.rollback()
-                print(f"Error adding user: {e}")  # Debugging
-                flash("An error occurred while adding the user. Please try again.")
-        else:
-            print("User with this email already exists.")  # Debugging
-            flash("A user with this email already exists.")
-    else:
-        print("Form validation failed.")  # Debugging
-        print("Form errors:", form.errors)  # Debugging
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        role = request.form.get('role')
+        skill = request.form.get('skill')
 
-    return render_template("register.html", form=form, name=name)
+        # Validate form inputs
+        if not username or not email or not password or not confirm_password or not role:
+            flash("All fields are required!")
+            return redirect(url_for('register'))
+
+        if password != confirm_password:
+            flash("Passwords do not match!")
+            return redirect(url_for('register'))
+
+        # Check if the username or email already exists
+        existing_user = Users.query.filter((Users.username == username) | (Users.email == email)).first()
+        if existing_user:
+            flash("Username or email already exists!")
+            return redirect(url_for('register'))
+
+        # Create a new user
+        hashed_password = generate_password_hash(password)
+        new_user = Users(
+            username=username,
+            email=email,
+            password_hash=hashed_password,
+            role=role,
+            skill=skill,
+            name=username  # Default name to username
+        )
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash("Registration successful! Please log in.")
+        return redirect(url_for('login'))
+
+    return render_template("register.html")
 
 @app.route('/set_company_policy', methods=['GET', 'POST'])
 def set_company_policy():
