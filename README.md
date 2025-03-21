@@ -27,6 +27,10 @@ Mladi-Bogati-Tuesari предоставя на потребителите въз
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Технологии използвани в апликацията:
+<<<<<<< HEAD
+=======
+        
+>>>>>>> f18b0d62267f9eefe2b3618d55fbd294f98b2322
         javascript
         python
         flask
@@ -35,4 +39,56 @@ Mladi-Bogati-Tuesari предоставя на потребителите въз
         html
         css
         bootstrap 5 
+<<<<<<< HEAD
         
+=======
+
+
+##Използвани бибилиотеки: 
+
+Python:
+1. Flask – flask
+   Flask
+    render_template
+    request
+    flash
+    redirect
+    url_for
+    session
+    logging
+
+2. Flask-SQLAlchemy – flask_sqlalchemy
+    SQLAlchemy
+
+3. Werkzeug – werkzeug.security
+    generate_password_hash
+    check_password_hash
+
+4.Flask-Login – flask_login
+    UserMixin
+    LoginManager
+    login_user
+    logout_user
+    login_required
+    current_user
+
+5. OR-Tools – ortools.sat.python
+    cp_model (за constraint programming модели)
+
+6. SQLAlchemy ORM – sqlalchemy.orm
+    joinedload (за ефективно зареждане на релации)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Нашият екип: 
+
+    Павел Иванов 
+    Виктория  Ганчева 
+    Александър Димитров
+    Деян Нъков 
+    Никол Пенева
+    Борис Бачев (Ментор)
+
+  Повече информация: https://hacktues.bg/teams/mladi-bogati-tuesari
+
+>>>>>>> f18b0d62267f9eefe2b3618d55fbd294f98b2322
