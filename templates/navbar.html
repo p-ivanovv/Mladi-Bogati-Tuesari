@@ -3,7 +3,12 @@
     <summary></summary>
     <nav class="menu">
         <a href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('add_shift') }}">Shifts</a>
+        {% if current_user.role == 'manager' %}
+            <a href="{{ url_for('add_shift') }}">Shifts</a>
+        {% else %}
+            <a href="{{ url_for('calendar_data') }}">Shifts</a>
+        {% endif %}
+
         <a href="{{ url_for('dashboard') }}">Dashboard</a>
         {% if not current_user.is_authenticated %}
             {% if request.endpoint == 'register' %}
