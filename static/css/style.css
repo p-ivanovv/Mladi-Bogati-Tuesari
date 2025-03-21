@@ -45,15 +45,15 @@ details[open] .menu {
   animation-name: menuAnim;
 }
 
-details[open] summary::after {
+/*details[open] summary::after {
   content: "";
-}
+}*/
 .menu {
   height:   0;
   width: fit-content;
-  border-radius: var(--cornerRad);
+/*border-radius: var(--cornerRad);*/
   background-color: var(--primColor);
-  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px 0 rgba(177, 95, 95, 0.2);
   margin-top: 8px;
   display: flex;
   flex-direction: column;
