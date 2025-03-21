@@ -140,13 +140,22 @@
         <input type="password" placeholder="Confirm Password" id="confirm_password" name="confirm_password" required>
 
         <label for="role">Role</label>
-        <select id="role" name="role" required>
-            <option value="manager">Manager</option>
-            <option value="employee">Employee</option>
+        <select id="role" name="role" required >
+            <option value="manager" style="color: black;">Manager</option>
+            <option value="employee" style="color: black;">Employee</option>
         </select>
 
         <label for="skill">Skill</label>
-        <input type="text" placeholder="Skill (optional)" id="skill" name="skill">
+        <select id="skill" name="skill" required>
+            <option value="cashier" style="color: black;">Cashier</option>
+            <option value="cook" style="color: black;">Cook</option>
+            <option value="cleaner" style="color: black;">Cleaner</option>
+            <option value="waiter" style="color: black;">Waiter</option>
+            <option value="bartender" style="color: black;">Bartender</option>
+            <option value="manager" style="color: black;">Manager</option>
+            <option value="security" style="color: black;">Security</option>
+            <option value="other" style="color: black;">Other</option>
+        </select>
 
         <button type="submit">Sign Up</button>
     </form>
