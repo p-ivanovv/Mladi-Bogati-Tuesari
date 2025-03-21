@@ -328,47 +328,56 @@ def add_shift():
         start_time = request.form.get('start_time')
         end_time = request.form.get('end_time')
         user_id = request.form.get('user_id')
-        day = datetime.strptime(date, '%Y-%m-%d').strftime('%A')
+        day = datetime.strptime(date, '%Y-%m-%d').strftime('%A') if date else None
 
-        if date and start_time and end_time and user_id and day:
-            shift_year = datetime.strptime(date, '%Y-%m-%d').year
-            if shift_year != 2025:
-                flash("The year must be 2025.")
-                return redirect(url_for('add_shift'))
-
-            if start_time >= end_time:
-                flash("Start time must be earlier than end time.")
-                return redirect(url_for('add_shift'))
-
-            if shift_id:
-                old_shift = Shifts.query.get(shift_id)
-                if old_shift:
-                    db.session.delete(old_shift)
-                    db.session.commit()
-
-            overlapping_shifts = Shifts.query.filter(
-                Shifts.user_id == user_id,
-                Shifts.date == date,
-                db.or_(
-                    db.and_(Shifts.start_time <= start_time, Shifts.end_time > start_time),
-                    db.and_(Shifts.start_time < end_time, Shifts.end_time >= end_time),
-                    db.and_(Shifts.start_time >= start_time, Shifts.end_time <= end_time)
-                )
-            ).all()
-
-            if overlapping_shifts:
-                flash("Shift overlaps with an existing shift for this employee.")
-                return redirect(url_for('add_shift'))
-
-            # Add the new shift
-            new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id, day=day)
-            db.session.add(new_shift)
-            db.session.commit()
-
-            flash("Shift updated successfully!" if shift_id else "Shift added successfully!")
-            return redirect(url_for('add_shift'))
-        else:
+        # Ensure all required fields are provided
+        if not date or not start_time or not end_time or not user_id:
             flash("All fields are required!")
+            return redirect(url_for('add_shift'))
+
+        shift_year = datetime.strptime(date, '%Y-%m-%d').year
+        if shift_year != 2025:
+            flash("The year must be 2025.")
+            return redirect(url_for('add_shift'))
+
+        if start_time >= end_time:
+            flash("Start time must be earlier than end time.")
+            return redirect(url_for('add_shift'))
+
+        if shift_id:
+            old_shift = Shifts.query.get(shift_id)
+            if old_shift:
+                db.session.delete(old_shift)
+                db.session.commit()
+
+        overlapping_shifts = Shifts.query.filter(
+            Shifts.user_id == user_id,
+            Shifts.date == date,
+            db.or_(
+                db.and_(Shifts.start_time <= start_time, Shifts.end_time > start_time),
+                db.and_(Shifts.start_time < end_time, Shifts.end_time >= end_time),
+                db.and_(Shifts.start_time >= start_time, Shifts.end_time <= end_time)
+            )
+        ).all()
+
+        if overlapping_shifts:
+            flash("Shift overlaps with an existing shift for this employee.")
+            return redirect(url_for('add_shift'))
+
+        # Fetch the skill of the selected user
+        user = Users.query.get(user_id)
+        if not user:
+            flash("Selected user does not exist.")
+            return redirect(url_for('add_shift'))
+
+        # Add the new shift with the user's skill
+        new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id, day=day, skill=user.skill)
+        db.session.add(new_shift)
+        db.session.commit()
+
+        flash("Shift updated successfully!" if shift_id else "Shift added successfully!")
+        return redirect(url_for('add_shift'))
+
     users = Users.query.all()
     shifts = Shifts.query.all()
 
