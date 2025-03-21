@@ -322,12 +322,12 @@ def add_shift():
         flash("Access Denied: Only managers can add shifts.")
         return redirect(url_for('home'))
     if request.method == 'POST':
-        shift_id = request.form.get('shift_id')
+        shift_id = request.form.get('shift_id')  # Get the shift ID if editing
         date = request.form.get('date')
         start_time = request.form.get('start_time')
         end_time = request.form.get('end_time')
         user_id = request.form.get('user_id')
-        day = datetime.strptime(date, '%Y-%m-%d').strftime('%A')
+        day = datetime.strptime(date, '%Y-%m-%d').strftime('%A')  # Get the day of the week
 
         if date and start_time and end_time and user_id and day:
             shift_year = datetime.strptime(date, '%Y-%m-%d').year
@@ -338,6 +338,12 @@ def add_shift():
             if start_time >= end_time:
                 flash("Start time must be earlier than end time.")
                 return redirect(url_for('add_shift'))
+
+            if shift_id:
+                old_shift = Shifts.query.get(shift_id)
+                if old_shift:
+                    db.session.delete(old_shift)
+                    db.session.commit()
 
             overlapping_shifts = Shifts.query.filter(
                 Shifts.user_id == user_id,
@@ -353,15 +359,11 @@ def add_shift():
                 flash("Shift overlaps with an existing shift for this employee.")
                 return redirect(url_for('add_shift'))
 
+            # Add the new shift
             new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id, day=day)
             db.session.add(new_shift)
-
-            if shift_id:
-                old_shift = Shifts.query.get(shift_id)
-                if old_shift:
-                    db.session.delete(old_shift)
-
             db.session.commit()
+
             flash("Shift updated successfully!" if shift_id else "Shift added successfully!")
             return redirect(url_for('add_shift'))
         else:
@@ -372,44 +374,6 @@ def add_shift():
     today = datetime.now()
     calendar_days = [today + timedelta(days=i) for i in range(7)]
     return render_template('add_shift.html', users=users, shifts=shifts, calendar_days=calendar_days)
-
-@app.route('/shift/edit/<int:shift_id>', methods=['GET', 'POST'])
-@login_required
-def edit_shift(shift_id):
-    if current_user.role != 'manager':
-        flash("Access Denied: Only managers can edit shifts.")
-        return redirect(url_for('home'))
-    shift = Shifts.query.get_or_404(shift_id)
-    if request.method == 'POST':
-        new_date = request.form.get('date')
-        new_start_time = request.form.get('start_time')
-        new_end_time = request.form.get('end_time')
-
-        if new_date and new_start_time and new_end_time:
-            overlapping_shifts = Shifts.query.filter(
-                Shifts.user_id == shift.user_id,
-                Shifts.date == new_date,
-                Shifts.id != shift.id,
-                db.or_(
-                    db.and_(Shifts.start_time <= new_start_time, Shifts.end_time > new_start_time),
-                    db.and_(Shifts.start_time < new_end_time, Shifts.end_time >= new_end_time),
-                    db.and_(Shifts.start_time >= new_start_time, Shifts.end_time <= new_end_time)
-                )
-            ).all()
-
-            if overlapping_shifts:
-                flash("Shift overlaps with an existing shift for this employee.")
-                return redirect(url_for('edit_shift', shift_id=shift_id))
-
-            shift.date = new_date
-            shift.start_time = new_start_time
-            shift.end_time = new_end_time
-            db.session.commit()
-            flash("Shift updated successfully!")
-            return redirect(url_for('calendar_data_all'))
-        else:
-            flash("All fields are required!")
-    return render_template('edit_shift.html', shift=shift)
 
 @app.route('/shift/delete/<int:shift_id>', methods=['POST'])
 @login_required
