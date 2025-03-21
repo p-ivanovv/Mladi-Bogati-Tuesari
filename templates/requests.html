@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Time Off Requests</h2>
+
+<table>
+    <tr>
+        <th>Employee</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Reason</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+    {% for request in requests %}
+    <tr>
+        <td>{{ request.user.name }}</td>
+        <td>{{ request.start_date }}</td>
+        <td>{{ request.end_date }}</td>
+        <td>{{ request.reason }}</td>
+        <td>{{ request.status }}</td>
+        <td>
+            {% if request.status == 'Pending' %}
+            <form method="POST" action="{{ url_for('view_time_off_request') }}">
+                <input type="hidden" name="request_id" value="{{ request.id }}">
+                <button type="submit" name="action" value="approve">Approve</button>
+                <button type="submit" name="action" value="reject">Reject</button>
+            </form>
+            {% else %}
+            {{ request.status }}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

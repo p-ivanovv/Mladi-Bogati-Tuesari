@@ -15,7 +15,6 @@
     <div class="card-body">
         <p><strong>Name:</strong> {{ current_user.name }}</p>
         <p><strong>Username:</strong> {{ current_user.username }}</p>
-        <p><strong>User ID:</strong> {{ current_user.id }}</p>
         {% if current_user.role == 'manager' %}
             <p><strong>Role:</strong> Manager</p>
             {% if company %}
@@ -62,10 +61,13 @@
     <a href="{{ url_for('set_shift_template') }}" class="btn btn-secondary">Set Shift Template</a>
     <a href="{{ url_for('view_day_overrides') }}" class="btn btn-secondary">View Day Override</a>
     <a href="{{ url_for('view_shift_templates') }}" class="btn btn-secondary">View Shift Template</a>
+    <a href="{{ url_for('requests') }}" class="btn btn-secondary">View My Requests</a>
+
 </div>
 {% else %}
 <div style="text-align: center; margin-top: 20px;">
     <a href="{{ url_for('calendar_data') }}" class="btn btn-primary">View Shifts</a>
+    <a href="{{ url_for('requests_employee') }}" class="btn btn-secondary">View My Requests</a>
 </div>
 {% endif %}
 </div>
