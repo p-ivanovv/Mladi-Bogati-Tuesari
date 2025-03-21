@@ -14,6 +14,7 @@ class UserForm(FlaskForm):
 	password_hash = PasswordField('Password', validators=[DataRequired(), EqualTo('password_hash2', message='Passwords Must Match!')])
 	password_hash2 = PasswordField('Confirm Password', validators=[DataRequired()])
 	role = SelectField('Role', choices=[('manager', 'Manager'), ('employee', 'Employee')], validators=[DataRequired()], default='employee')
+	skill = StringField("Skill", validators=[DataRequired()])
 	submit = SubmitField("Submit")
 	
 class TimeOffForm(FlaskForm):

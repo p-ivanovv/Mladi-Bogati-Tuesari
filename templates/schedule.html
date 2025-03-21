@@ -1,0 +1,20 @@
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Day</th>
+            <th>Start Time</th>
+            <th>Employee</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for shift in shifts %}
+        <tr>
+            <td>{{ shift.date }}</td>
+            <td>{{ shift.day }}</td>
+            <td>{{ shift.start_time }}</td>
+            <td>{{ shift.user.name }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

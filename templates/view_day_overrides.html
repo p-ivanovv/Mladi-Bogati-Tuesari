@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Day Overrides</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Day Overrides</h1>
+
+    {% if day_overrides %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Skill</th> <!-- Changed from 'Role' to 'Skill' -->
+                    <th>Required Employees</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for override in day_overrides %}
+                    <tr>
+                        <td>{{ override.day }}</td>
+                        <td>{{ override.start_time }}</td>
+                        <td>{{ override.end_time }}</td>
+                        <td>{{ override.skill }}</td> <!-- Changed from 'role' to 'skill' -->
+                        <td>{{ override.required_employees }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No day overrides found. Please add an override first.</p>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,5 @@
+<form method="POST" action="/set_company_policy">
+    <label for="works_on_weekends">Works on Weekends:</label>
+    <input type="checkbox" name="works_on_weekends" {% if config and config.works_on_weekends %}checked{% endif %}>
+    <button type="submit">Update Policy</button>
+</form>

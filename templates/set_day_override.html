@@ -1,0 +1,26 @@
+<form method="POST" action="/set_day_override">
+    <label for="day">Day:</label>
+    <select name="day" required>
+        <option value="Mon">Monday</option>
+        <option value="Tue">Tuesday</option>
+        <option value="Wed">Wednesday</option>
+        <option value="Thu">Thursday</option>
+        <option value="Fri">Friday</option>
+        <option value="Sat">Saturday</option>
+        <option value="Sun">Sunday</option>
+    </select>
+
+    <label for="start_time">Start Time:</label>
+    <input type="time" name="start_time" required>
+
+    <label for="end_time">End Time:</label>
+    <input type="time" name="end_time" required>
+
+    <label for="role">Skill:</label>
+    <input type="text" name="skill" required>
+
+    <label for="required_employees">Required Employees:</label>
+    <input type="number" name="required_employees" required>
+
+    <button type="submit">Add Override</button>
+</form>

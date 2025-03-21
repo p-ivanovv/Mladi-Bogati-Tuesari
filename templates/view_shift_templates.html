@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Shift Templates</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Shift Templates</h1>
+
+    {% if shift_templates %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Day Type</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Skill</th> <!-- Changed from 'Role' to 'Skill' -->
+                    <th>Required Employees</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for template in shift_templates %}
+                    <tr>
+                        <td>{{ template.day_type }}</td>
+                        <td>{{ template.start_time }}</td>
+                        <td>{{ template.end_time }}</td>
+                        <td>{{ template.skill }}</td> <!-- Changed from 'role' to 'skill' -->
+                        <td>{{ template.required_employees }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No shift templates found. Please add a template first.</p>
+    {% endif %}
+</body>
+</html>
