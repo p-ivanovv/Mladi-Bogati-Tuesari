@@ -5,12 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Shift Calendar</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar_data.css') }}">
+    <script>
+        function openRequestForm(date) {
+            document.getElementById('requestForm').style.display = 'block';
+            document.getElementById('timeOffDate').value = date;
+        }
+
+        function closeRequestForm() {
+            document.getElementById('requestForm').style.display = 'none';
+        }
+    </script>
+    <style>
+        .request-form {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
+            border-radius: 5px;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Your Shift Calendar</h1>
         <a href="{{ url_for('dashboard') }}" class="btn btn-secondary" style="display: block; text-align: center; margin-bottom: 20px;">Go Home</a>
-        
+
         <div class="calendar">
             {% for day in calendar_days %}
                 <div class="day">
@@ -19,7 +51,8 @@
                         {% if shift.date == day.strftime('%Y-%m-%d') and shift.user_id == current_user.id %}
                             <div class="shift">
                                 {{ shift.start_time }} - {{ shift.end_time }}<br>
-                                <strong>Skill:</strong> {{ shift.user.skill or "Not Assigned" }}
+                                <strong>Skill:</strong> {{ shift.user.skill or "Not Assigned" }}<br>
+                                <button onclick="openRequestForm('{{ shift.date }}')">Request Time Off</button>
                             </div>
                         {% endif %}
                     {% endfor %}
@@ -27,5 +60,23 @@
             {% endfor %}
         </div>
     </div>
+
+    <!-- Popup Form for Requesting Time Off -->
+    <div id="requestForm" class="request-form">
+        <h2>Request Time Off</h2>
+        <form method="POST" action="{{ url_for('requests_employee') }}">
+            <label for="timeOffDate">Date:</label>
+            <input type="date" id="timeOffDate" name="start_date" readonly required>
+            <label for="end_date">End Date:</label>
+            <input type="date" name="end_date" required>
+            <label for="reason">Reason:</label>
+            <textarea name="reason" required></textarea>
+            <button type="submit">Submit Request</button>
+            <button type="button" onclick="closeRequestForm()">Cancel</button>
+        </form>
+    </div>
+
+    <!-- Overlay to Dim Background -->
+    <div class="overlay" id="overlay" onclick="closeRequestForm()"></div>
 </body>
 </html>

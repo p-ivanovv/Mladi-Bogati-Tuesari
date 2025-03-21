@@ -72,6 +72,10 @@ class TimeOffRequest(db.Model):
     end_date = db.Column(db.Date, nullable=False)
     reason = db.Column(db.String(200))
     status = db.Column(db.String(20), default='Pending')
+    
+    # Relationship to Users model
+    user = db.relationship('Users', backref='time_off_requests')
+
 
 class ShiftTemplate(db.Model):
     __tablename__ = 'shift_template'
@@ -247,52 +251,77 @@ def dashboard():
         company = current_user.company
     return render_template('dashboard.html', company=company)
 
-@app.route('/request_time_off', methods=['GET', 'POST'])
+@app.route('/requests_employee', methods=['GET', 'POST'])
 @login_required
-def request_time_off():
+def requests_employee():
     if request.method == 'POST':
         start_date = request.form.get('start_date')
         end_date = request.form.get('end_date')
         reason = request.form.get('reason')
+
         if start_date and end_date and reason:
-            new_request = TimeOffRequest(user_id=current_user.id, start_date=start_date, end_date=end_date, reason=reason)
-            db.session.add(new_request)
-            db.session.commit()
-            flash("Request submitted successfully!")
+            try:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+                end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+                new_request = TimeOffRequest(
+                    user_id=current_user.id,
+                    start_date=start_date,
+                    end_date=end_date,
+                    reason=reason
+                )
+
+                db.session.add(new_request)
+                db.session.commit()
+                flash("Request submitted successfully!")
+            except ValueError:
+                flash("Invalid date format. Please use YYYY-MM-DD.")
         else:
             flash("All fields are required!")
-    requests = TimeOffRequest.query.filter_by(user_id=current_user.id).all()
-    return render_template('request_time_off.html', requests=requests)
-    #return render_template('request_time_off.html')
 
-@app.route('/requests', methods=['GET', 'POST'])
+    requests = TimeOffRequest.query.filter_by(user_id=current_user.id).all()
+    return render_template('requests_employee.html', requests=requests)
+
+
+@app.route('/requests', methods=['GET'])
 @login_required
 def requests():
     if current_user.role != 'manager':
         flash("You are not authorized to view this page.")
-        return url_for('shifts')
-    requests = TimeOffRequest.query.all()
+        return redirect(url_for('dashboard'))
+
+    requests = TimeOffRequest.query.options(db.joinedload(TimeOffRequest.user)).all()  # Load user details
+
     return render_template('requests.html', requests=requests)
+
+
+
 
 @app.route('/view_time_off_request', methods=['GET', 'POST'])
 @login_required
 def view_time_off_request():
     if current_user.role != 'manager':
         flash("You are not authorized to view this page.")
-        return url_for('shifts')
+        return redirect(url_for('dashboard'))  
+
     if request.method == 'POST':
         request_id = request.form.get('request_id')
         action = request.form.get('action')
-        request = TimeOffRequest.query.get(request_id)
-        if action == 'approve':
-            request.status = 'Approved'
-        elif action == 'reject':
-            request.status = 'Rejected'
+        time_off_request = TimeOffRequest.query.get(request_id)
 
-        db.session.commit()
-        flash("Request updated successfully!")
-        return url_for('requests')
-    return render_template('view_time_off_request.html', requests=requests)
+        if time_off_request:
+            if action == 'approve':
+                time_off_request.status = 'Approved'
+            elif action == 'reject':
+                time_off_request.status = 'Rejected'
+            db.session.commit()
+            flash(f"Request {action}d successfully!")
+        else:
+            flash("Invalid request ID.")
+
+    return redirect(url_for('requests'))
+
+
 
 @app.route('/')
 def home():
@@ -347,7 +376,6 @@ def add_shift():
         user_id = request.form.get('user_id')
         day = datetime.strptime(date, '%Y-%m-%d').strftime('%A') if date else None
 
-        # Ensure all required fields are provided
         if not date or not start_time or not end_time or not user_id:
             flash("All fields are required!")
             return redirect(url_for('add_shift'))
@@ -381,13 +409,11 @@ def add_shift():
             flash("Shift overlaps with an existing shift for this employee.")
             return redirect(url_for('add_shift'))
 
-        # Fetch the skill of the selected user
         user = Users.query.get(user_id)
         if not user:
             flash("Selected user does not exist.")
             return redirect(url_for('add_shift'))
 
-        # Add the new shift with the user's skill
         new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id, day=day, skill=user.skill)
         db.session.add(new_shift)
         db.session.commit()
@@ -683,6 +709,10 @@ def view_schedule():
     shifts = Shifts.query.options(joinedload(Shifts.user)).all()
     print("Shifts:", shifts)  
     return render_template('schedule.html', shifts=shifts)
+
+@app.route('/static/css/animations.css')
+def serve_animations_css():
+    return app.send_static_file('css/animations.css')
 
 if __name__ == '__main__':
     app.run(debug=True)

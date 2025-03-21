@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Request Time Off</h2>
+
+<h3>Your Requests</h3>
+<table>
+    <tr>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Reason</th>
+        <th>Status</th>
+    </tr>
+    {% for request in requests %}
+    <tr>
+        <td>{{ request.start_date }}</td>
+        <td>{{ request.end_date }}</td>
+        <td>{{ request.reason }}</td>
+        <td>{{ request.status }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
