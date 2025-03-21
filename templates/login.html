@@ -1,13 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% for message in get_flashed_messages() %}
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-{% endfor %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -110,19 +103,16 @@
     </style>
 </head>
 <body>
+<<<<<<< HEAD
+=======
     
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
 
-
+>>>>>>> b77e9126a3d733df49071fbb0a5e80872d9f89f2
     <div class="background">
         <div class="shape"></div>
         <div class="shape"></div>
     </div>
-    
-    <form method="POST">
+    <form method="POST" class="animate__animated animate__fadeIn">
         {{ form.hidden_tag() }}
         <h3>Login Here</h3>
 
