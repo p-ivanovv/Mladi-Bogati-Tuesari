@@ -3,7 +3,7 @@ body, html {
     height: 100%;
     margin: 0;
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(to right, #141E30, #243B55);
+    background: linear-gradient(to right, #0d131e, #101f49);
     color: #ffffff;
 }
 
@@ -175,7 +175,7 @@ button:hover, .btn:hover {
 
 /* Shift Styling */
 .shift {
-    background: #ff9800;
+    background: #d13f00;
     color: white;
     padding: 8px;
     border-radius: 5px;
