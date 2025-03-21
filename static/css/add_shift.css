@@ -160,7 +160,6 @@ button:hover, .btn:hover {
     transition: 0.3s;
 }
 
-<<<<<<< HEAD
 .override-container {
     max-width: 600px;
     margin: 50px auto;
@@ -213,35 +212,3 @@ button:hover, .btn:hover {
     background-color: #D0B8A8;
 }
 
-=======
-.day:hover {
-    background: rgba(255, 255, 255, 0.25);
-    cursor: pointer;
-}
-
-/* Today's Date Highlight */
-.today {
-    background: rgba(255, 255, 255, 0.4);
-    font-weight: bold;
-    border: 2px solid #ffcc00;
-    box-shadow: 0 0 10px #ffcc00;
-}
-
-/* Shift Styling */
-.shift {
-    background: #d13f00;
-    color: white;
-    padding: 8px;
-    border-radius: 5px;
-    font-size: 0.8em;
-    margin-top: 5px;
-    text-align: center;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.shift:hover {
-    background: #e68900;
-    transform: scale(1.05);
-}
->>>>>>> 70c19cf6b925f850bb37f97645a725480dac6b4a
