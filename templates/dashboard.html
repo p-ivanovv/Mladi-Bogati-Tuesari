@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container" style="display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center;"> <!-- Add text-align: center here -->
+<div class="container animate__animated animate__fadeIn" style="display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center;">
 {% for message in get_flashed_messages() %}
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
         {{ message }}
@@ -72,5 +72,5 @@
     <a href="{{ url_for('calendar_data') }}" class="btn btn-primary">View Shifts</a>
 </div>
 {% endif %}
-</div> <!-- Add this line -->
+</div>
 {% endblock %}

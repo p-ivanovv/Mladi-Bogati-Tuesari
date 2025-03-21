@@ -722,5 +722,9 @@ def view_schedule():
     print("Shifts:", shifts)  
     return render_template('schedule.html', shifts=shifts)
 
+@app.route('/static/css/animations.css')
+def serve_animations_css():
+    return app.send_static_file('css/animations.css')
+
 if __name__ == '__main__':
     app.run(debug=True)
