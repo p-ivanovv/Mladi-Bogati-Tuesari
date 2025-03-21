@@ -127,8 +127,7 @@
                 <div class="shape"></div>
                 <div class="shape"></div>
         </div>
-        <form method="POST" action="{% url 'signup' %}">
-                {% csrf_token %}
+        <form method="POST" action="{{ url_for('login')}}">
                 <h3>Sign Up Here</h3>
 
                 <label for="username">Username</label>
