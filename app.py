@@ -642,15 +642,30 @@ def generate_schedule(works_on_weekends):
     print("Shift Templates:", [(t.day_type, t.start_time, t.end_time, t.skill, t.required_employees) for t in shift_templates])
     print("Day Overrides:", [(o.day, o.start_time, o.end_time, o.skill, o.required_employees) for o in day_overrides])
 
-    day_name_map = {
-        "Mon": "Monday", "Tue": "Tuesday", "Wed": "Wednesday",
-        "Thu": "Thursday", "Fri": "Friday", "Sat": "Saturday", "Sun": "Sunday"
+    # Calculate the start of the next week (next Monday)
+    today = datetime.now()
+    days_until_next_monday = (7 - today.weekday()) % 7  # Days until the next Monday
+    start_of_week = today + timedelta(days=days_until_next_monday)
+
+    # Map full day names to actual dates
+    day_to_date = {
+        "Monday": start_of_week.date(),
+        "Tuesday": (start_of_week + timedelta(days=1)).date(),
+        "Wednesday": (start_of_week + timedelta(days=2)).date(),
+        "Thursday": (start_of_week + timedelta(days=3)).date(),
+        "Friday": (start_of_week + timedelta(days=4)).date(),
+        "Saturday": (start_of_week + timedelta(days=5)).date(),
+        "Sunday": (start_of_week + timedelta(days=6)).date(),
     }
 
-    today = datetime.now()
-    day_to_date = {
-        full_day: (today + timedelta(days=i)).date()
-        for i, full_day in enumerate(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+    day_name_map = {
+        "Mon": "Monday",
+        "Tue": "Tuesday",
+        "Wed": "Wednesday",
+        "Thu": "Thursday",
+        "Fri": "Friday",
+        "Sat": "Saturday",
+        "Sun": "Sunday",
     }
 
     employee_ids = [emp.id for emp in employees]
@@ -692,7 +707,7 @@ def generate_schedule(works_on_weekends):
             emp_id for emp_id in employee_ids
             if (emp_id, day, start_time, end_time, skill) in employee_shifts
         ]
-        print(f"Eligible employees for {day}, {start_time}-{end_time}, Skill: {skill}: {eligible_employees}")  
+        print(f"Eligible employees for {day}, {start_time}-{end_time}, Skill: {skill}: {eligible_employees}")
         if len(eligible_employees) < required_employees:
             print(f"Not enough eligible employees for {day}, {start_time}-{end_time}, Skill: {skill}")
             continue
@@ -731,7 +746,6 @@ def generate_schedule(works_on_weekends):
     else:
         print(f"Solver failed with status: {solver.StatusName(status)}")
         return None
-
 
     
 @app.route('/generate_schedule', methods=['GET', 'POST'])
