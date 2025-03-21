@@ -4,6 +4,7 @@ body, html {
     font-family: Arial, Helvetica, sans-serif;
     overflow: hidden;
 }
+
 .video-bg {
     position: absolute;
     top: 0;
@@ -14,6 +15,7 @@ body, html {
     object-fit: cover;
     z-index: -1;
 }
+
 .overlay {
     position: absolute;
     top: 0;
@@ -23,6 +25,7 @@ body, html {
     background: rgba(0, 0, 0, 0.8);
     z-index: 0;
 }
+
 .content {
     position: absolute;
     top: 50%;
@@ -32,13 +35,16 @@ body, html {
     text-align: center;
     z-index: 1;
 }
+
 .content h1 {
     font-size: 7em; /* Text size */
     font-family: 'Merienda', cursive;
 }
+
 .buttons {
     margin-top: 20px;
 }
+
 .btn {
     display: inline-block;
     padding: 10px 20px;
@@ -50,6 +56,7 @@ body, html {
     text-decoration: none;
     transition: background-color 0.3s, color 0.3s;
 }
+
 .btn:hover {
     background-color: black;
     color: white;
