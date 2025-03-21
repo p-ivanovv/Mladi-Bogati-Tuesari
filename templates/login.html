@@ -8,12 +8,9 @@
     </div>
 {% endfor %}
 
-<div class="container mt-5 d-flex justify-content-center">
-    <div class="col-md-6">
+<div class="container mt-9 d-flex justify-content-center ">
+    <div class="col-md-3">
         <h1 class="text-center mb-4">Log In</h1>
-        <div class="text-center mb-4">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="max-width: 100px;">
-        </div>
         <div class="shadow p-4 mb-5 bg-body rounded">
             <form method="POST">
                 {{ form.hidden_tag() }}
