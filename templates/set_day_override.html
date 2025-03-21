@@ -9,15 +9,18 @@
         body {
           overflow-y: scroll;
         }
+        label {
+          color: black;
+        }
       </style>
 </head>
-<body style="background-color: #080710;"> <!-- Dark background -->
+<body>
     {% include 'navbar.html' %}
     <div class="override-container">
         <h1>Set Day Override</h1>
         <form class="override-form" method="POST" action="{{ url_for('set_day_override') }}">
             <label for="day">Day:</label>
-            <select name="day" required>
+            <select name="day" required style="color: rgb(90, 83, 83);">
                 <option value="Mon">Monday</option>
                 <option value="Tue">Tuesday</option>
                 <option value="Wed">Wednesday</option>
