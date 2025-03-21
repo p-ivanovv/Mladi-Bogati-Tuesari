@@ -1,7 +1,114 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container animate__animated animate__fadeIn" style="max-width: 900px; margin-top: 20px;">
+<style>
+    /* Global Styling */
+    body, html {
+        height: 100%;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to right, #0d131e, #101f49);
+        color: #ffffff;
+        text-align: center;
+    }
+
+
+    /* Container */
+    .container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Card Styling */
+    .card {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+        color: white;
+        text-align: center;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        padding: 15px;
+        border-radius: 10px 10px 0 0;
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    .bg-primary { background: #1e3a8a !important; }
+    .bg-secondary { background: #374151 !important; }
+    .bg-dark { background: #111827 !important; }
+    .bg-info { background: #2563eb !important; }
+    .text-white { color: white !important; }
+
+    /* Flash Messages */
+    .alert {
+        border-radius: 10px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    /* Form & Input Fields */
+    .form-control {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .form-select {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    /* Button Styling */
+    .btn {
+        padding: 10px 15px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+        text-transform: uppercase;
+        border: none;
+    }
+
+    .btn-primary { background: #f1c40f; color: #080710; }
+    .btn-primary:hover { background: #d4ac0d; transform: scale(1.05); }
+    .btn-success { background: #22c55e; color: white; }
+    .btn-success:hover { background: #16a34a; }
+    .btn-secondary { background: #4b5563; color: white; }
+    .btn-secondary:hover { background: #374151; }
+    
+    /* List Styling */
+    .list-group-item {
+        background: rgba(255, 255, 255, 0.05);
+        border: none;
+        color: white;
+        padding: 15px;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="container animate__animated animate__fadeIn">
 
     <!-- Flash Messages -->
     {% for message in get_flashed_messages() %}
@@ -12,9 +119,9 @@
     {% endfor %}
 
     <!-- User Details -->
-    <div class="card shadow-lg border-0 rounded-lg text-center">
+    <div class="card shadow-lg border-0">
         <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">Welcome, {{ current_user.name }}!</h3>
+            <h3>Welcome, {{ current_user.name }}!</h3>
         </div>
         <div class="card-body">
             <p><i class="fas fa-user-circle fa-lg text-primary"></i> <strong>Username:</strong> {{ current_user.username }}</p>
@@ -37,7 +144,7 @@
 
         <!-- Create Company -->
         {% if not company %}
-            <div class="card shadow-lg border-0 rounded-lg mt-4">
+            <div class="card shadow-lg border-0 mt-4">
                 <div class="card-header bg-dark text-white text-center">
                     <h5>Create a Company</h5>
                 </div>
@@ -52,7 +159,7 @@
                 </div>
             </div>
         {% else %}
-            <div class="card shadow-lg border-0 rounded-lg mt-4">
+            <div class="card shadow-lg border-0 mt-4">
                 <div class="card-header bg-secondary text-white text-center">
                     <h5>Company: {{ company.name }}</h5>
                 </div>
@@ -76,7 +183,7 @@
             </div>
 
             <!-- Current Employees -->
-            <div class="card shadow-lg border-0 rounded-lg mt-4">
+            <div class="card shadow-lg border-0 mt-4">
                 <div class="card-header bg-info text-white text-center">
                     <h5>Current Employees</h5>
                 </div>
