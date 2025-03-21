@@ -1,3 +1,7 @@
+body {
+    background-color: white; /* Set the background color of the whole page to white */
+}
+
 .header-blue {
   background:rgbas(255,255,255,0.2);
   padding-bottom:80px;
@@ -11,14 +15,12 @@
 }
 
 .header-blue .navbar {
-  background:transparent;
-  padding-top:.75rem;
-  padding-bottom:.75rem;
+  background-color: rgba(0,0,0,0.2); 
   color:#fff;
   border-radius:0;
   box-shadow:none;
   border:none;
-  width: 90%; 
+  width: 100%; 
   margin: 0 auto; 
 }
 
@@ -37,9 +39,9 @@
 .header-blue .navbar .navbar-brand:hover {
   color:#f0f0f0;
 }
-
+/*линия под навбара при телефон*/
 .header-blue .navbar .navbar-collapse {
-  border-top:1px solid rgba(255,255,255,0.3);
+  border-top:1px solid rgb(245, 245, 245);
   margin-top:.5rem;
 }
 
@@ -49,9 +51,9 @@
     margin:0;
   }
 }
-
+/*логин бутон*/
 .header-blue .navbar .navbar-collapse span .login {
-  color:#d9d9d9;
+  color:#ff0000;
   margin-right:.5rem;
   text-decoration:none;
 }
@@ -61,7 +63,7 @@
 }
 
 .header-blue .navbar .navbar-toggler {
-  border-color:rgba(255,255,255,0.3);
+  border-color:rgba(255, 255, 255, 0.3);
 }
 
 .header-blue .navbar .navbar-toggler:hover, .header-blue .navbar-toggler:focus {
@@ -87,12 +89,7 @@
   }
 }
 
-.header-blue .navbar .navbar-nav > li > .dropdown-menu {
-  margin-top:-5px;
-  box-shadow:0 4px 8px rgba(0,0,0,.1);
-  background-color:#fff;
-  border-radius:2px;
-}
+
 
 .header-blue .navbar .dropdown-menu .dropdown-item:focus, .header-blue .navbar .dropdown-menu .dropdown-item {
   line-height:2;
@@ -102,9 +99,9 @@
 .header-blue .navbar .dropdown-menu .dropdown-item:focus, .header-blue .navbar .dropdown-menu .dropdown-item:hover {
   background:#ebeff1;
 }
-
+/*sign up бутон*/
 .header-blue .action-button, .header-blue .action-button:not(.disabled):active {
-  border:1px solid rgba(255,255,255,0.7);
+  border:1px solid rgba(255, 18, 18, 0.7);
   border-radius:40px;
   color:#ebeff1;
   box-shadow:none;
@@ -161,3 +158,25 @@
   line-height:1.4;
 }
 
+.form-control {
+  background-color: #ffffffbf; 
+  border: 1px solid #7D6E83; 
+}
+
+.bg-body {
+  background-color: #0c0c0c42 !important; 
+  padding: 20px;
+  border-radius: 10px; 
+}
+
+.btn-primary {
+  background-color: #7D6E83 !important; 
+  border-color: #ffffff !important; 
+  color: rgb(255, 255, 255) !important; /* Бял текст */
+  font-size: 1.2em;
+}
+
+.btn-primary:hover {
+  background-color: #4a3a51 !important; 
+  border-color: #ffffff !important;
+}

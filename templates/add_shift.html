@@ -3,56 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Shift</title>
+    <title>Shift Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_shift.css') }}">
     <style>
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .day {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: center;
-            background-color: #f9f9f9;
-        }
-        .shift {
-            margin-top: 5px;
-            padding: 5px;
-            background-color: #d1ecf1;
-            border: 1px solid #bee5eb;
-            border-radius: 5px;
-            font-size: 0.9em;
+        .modal-content {
+            /* Add this block to move the modal content higher */
+            position: relative;
+            top: -50px;
         }
     </style>
 </head>
 <body>
-    <h1>Add Shift</h1>
-    <form method="POST" action="{{ url_for('add_shift') }}">
-        <label for="date">Date:</label>
-        <input type="date" id="date" name="date" required><br>
-        <label for="start_time">Start Time:</label>
-        <input type="time" id="start_time" name="start_time" required><br>
-        <label for="end_time">End Time:</label>
-        <input type="time" id="end_time" name="end_time" required><br>
-        <label for="user_id">Assign to User:</label>
-        <select id="user_id" name="user_id" required>
-            {% for user in users %}
-                <option value="{{ user.id }}">{{ user.name }}</option>
-            {% endfor %}
-        </select><br>
-        <button type="submit">Add Shift</button>
-    </form>
-
+    <button id="openModal">Add Shift</button>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary" style="margin-left: 10px;">Go Home</a>
+    <div id="shiftModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Add Shift</h2>
+            <form id="shiftForm" method="POST" action="{{ url_for('add_shift') }}">
+                <input type="hidden" id="shift_id" name="shift_id">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required><br>
+                <label for="start_time">Start Time:</label>
+                <input type="time" id="start_time" name="start_time" required><br>
+                <label for="end_time">End Time:</label>
+                <input type="time" id="end_time" name="end_time" required><br>
+                <label for="user_id">Assign to User:</label>
+                <select id="user_id" name="user_id" required>
+                    {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.name }}</option>
+                    {% endfor %}
+                </select><br>
+                <button type="submit" id="submitButton">Save Shift</button>
+            </form>
+            {% if current_user.role == 'manager' %}
+            <form id="deleteShiftForm" method="POST" action="">
+                <button type="submit" id="deleteButton" style="background-color: red; color: white; display: none;">Delete Shift</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
     <h2>Shift Calendar</h2>
     <div class="calendar">
         {% for day in calendar_days %}
-            <div class="day"></div>
-                <strong>{{ day.strftime('%A, %d %B') }}</strong>
+            <div class="day">
+                <strong>{{ day.strftime('%A') }}</strong><br>
+                <span>{{ day.strftime('%d %B') }}</span>
                 {% for shift in shifts %}
-                    {% if shift.date == day.strftime('%Y-%m-%d') %}
-                        <div class="shift">
+                    {% if shift.date.date() == day.date() %}
+                        <div class="shift" data-id="{{ shift.id }}" data-date="{{ shift.date }}" data-start="{{ shift.start_time }}" data-end="{{ shift.end_time }}" data-user="{{ shift.user.id }}">
                             <strong>{{ shift.user.name }}</strong><br>
                             {{ shift.start_time }} - {{ shift.end_time }}
                         </div>
@@ -61,5 +60,60 @@
             </div>
         {% endfor %}
     </div>
+    <script>
+        var modal = document.getElementById("shiftModal");
+        var btn = document.getElementById("openModal");
+        var span = document.getElementsByClassName("close")[0];
+        var shiftIdInput = document.getElementById("shift_id");
+        var dateInput = document.getElementById("date");
+        var startTimeInput = document.getElementById("start_time");
+        var endTimeInput = document.getElementById("end_time");
+        var userSelect = document.getElementById("user_id");
+        var modalTitle = document.getElementById("modalTitle");
+        var deleteButton = document.getElementById("deleteButton");
+
+        btn.onclick = function() {
+            modal.style.display = "block";
+            modalTitle.innerText = "Add Shift";
+            shiftIdInput.value = "";
+            dateInput.value = "";
+            startTimeInput.value = "";
+            endTimeInput.value = "";
+            userSelect.value = "";
+            deleteButton.style.display = "none";
+        };
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        };
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+
+        document.querySelectorAll(".shift").forEach(shift => {
+            shift.addEventListener("click", function() {
+                modal.style.display = "block";
+                modalTitle.innerText = "Edit Shift";
+                shiftIdInput.value = this.getAttribute("data-id");
+                dateInput.value = this.getAttribute("data-date");
+                startTimeInput.value = this.getAttribute("data-start");
+                endTimeInput.value = this.getAttribute("data-end");
+                userSelect.value = this.getAttribute("data-user");
+                if (deleteButton) {
+                    deleteButton.style.display = "inline-block";
+                    document.getElementById("deleteShiftForm").action = `/shift/delete/${shiftIdInput.value}`;
+                    deleteButton.onclick = function(event) {
+                        event.preventDefault(); // Prevent form submission
+                        if (confirm("Are you sure you want to delete this shift?")) {
+                            document.getElementById("deleteShiftForm").submit();
+                        }
+                    };
+                }
+            });
+        });
+    </script>
 </body>
 </html>

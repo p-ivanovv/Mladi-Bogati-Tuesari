@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Shift Calendar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar_data.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Your Shift Calendar</h1>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary" style="display: block; text-align: center; margin-bottom: 20px;">Go Home</a>
+        
+        <div class="calendar">
+            {% for day in calendar_days %}
+                <div class="day">
+                    <strong>{{ day.strftime('%A, %d %B') }}</strong>
+                    {% for shift in shifts %}
+                        {% if shift.date.date() == day.date() and shift.user_id == current_user.id %}
+                            <div class="shift">
+                                {{ shift.start_time }} - {{ shift.end_time }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

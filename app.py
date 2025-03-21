@@ -85,6 +85,12 @@ class CompanyConfig(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     works_on_weekends = db.Column(db.Boolean, nullable=False, default=False)
 
+class Company(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False, unique=True)
+    manager_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    work_on_weekends = db.Column(db.Boolean, default=False)
+    employees = db.relationship('Users', backref='company', lazy=True)
 
 with app.app_context():
 	db.create_all()
@@ -207,15 +213,28 @@ def set_company_policy():
     return render_template('set_company_policy.html', config=config)
 
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
-
-@app.route('/plan')
-@login_required
-def plan():
-    return render_template('plan.html')
+    company = None
+    if current_user.role == 'manager':
+        company = Company.query.filter_by(manager_id=current_user.id).first()
+        if request.method == 'POST':
+            company_name = request.form.get('company_name')
+            work_on_weekends = request.form.get('work_on_weekends') == 'on'
+            if company_name:
+                new_company = Company(
+                    name=company_name,
+                    manager_id=current_user.id,
+                    work_on_weekends=work_on_weekends
+                )
+                db.session.add(new_company)
+                db.session.commit()
+                flash("Company created successfully!")
+                return redirect(url_for('dashboard'))
+    elif current_user.role == 'employee':
+        company = current_user.company
+    return render_template('dashboard.html', company=company)
 
 @app.route('/request_time_off', methods=['GET', 'POST'])
 @login_required
@@ -268,32 +287,33 @@ def view_time_off_request():
 def home():
     return render_template('startingpage.html')
 
-@app.route('/calendar-data')
+@app.route('/home')
+@login_required
+def home2():
+    if current_user.role == 'manager':
+        return render_template('add_shift.html')
+    else:
+        return render_template('home.html')
+
+
+@app.route('/calendar-data', methods=['GET'])
 @login_required
 def calendar_data():
-    if session.get('username'):
-        user = Users.query.filter_by(username=session['username']).first()
-        if user.role == 'Employee':
-            shifts = Shifts.query.filter_by(user_id=user.id).all()
-            return render_template('plan.html', shifts=shifts)
+    if current_user.role != 'employee':
+        flash("Access Denied: Only employees can view this page.")
+        return redirect(url_for('dashboard'))
+    
+    if current_user.company:
+        shifts = Shifts.query.join(Users).filter(Users.company_id == current_user.company.id).all()
     else:
-        flash("Please log in to access this page.")
-        return redirect(url_for('login'))
+        shifts = Shifts.query.filter_by(user_id=current_user.id).all()
 
-@app.route('/calendar-data-all')
-@login_required
-def calendar_data_all():
-    if session.get('username'):
-        user = Users.query.filter_by(username=session['username']).first()
-        if user.role == 'Manager':
-            shifts = Shifts.query.all()
-            return render_template('plan_all.html', shifts=shifts)
-        else:
-            flash("Access Denied: Only managers can view this page.")
-            return redirect(url_for('home'))
-    else:
-        flash("Please log in to access this page.")
-        return redirect(url_for('login'))
+    for shift in shifts:
+        shift.date = datetime.strptime(shift.date, '%Y-%m-%d')
+
+    today = datetime.now()
+    calendar_days = [today + timedelta(days=i) for i in range(7)]  # Generate the next 7 days
+    return render_template('calendar_data.html', shifts=shifts, calendar_days=calendar_days)
 
 @app.route('/shift/add', methods=['GET', 'POST'])
 @login_required
@@ -306,7 +326,32 @@ def add_shift():
         start_time = request.form.get('start_time')
         end_time = request.form.get('end_time')
         user_id = request.form.get('user_id')
+
         if date and start_time and end_time and user_id:
+            shift_year = datetime.strptime(date, '%Y-%m-%d').year
+            if shift_year != 2025:
+                flash("The year must be 2025.")
+                return redirect(url_for('add_shift'))
+
+            if start_time >= end_time:
+                flash("Start time must be earlier than end time.")
+                return redirect(url_for('add_shift'))
+
+            overlapping_shifts = Shifts.query.filter(
+                Shifts.user_id == user_id,
+                Shifts.date == date,
+                db.or_(
+                    db.and_(Shifts.start_time <= start_time, Shifts.end_time > start_time),
+                    db.and_(Shifts.start_time < end_time, Shifts.end_time >= end_time),
+                    db.and_(Shifts.start_time >= start_time, Shifts.end_time <= end_time)
+                )
+            ).all()
+
+            if overlapping_shifts:
+                flash("Shift overlaps with an existing shift for this employee.")
+                return redirect(url_for('add_shift'))
+
+            # Add the new shift
             new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id)
             db.session.add(new_shift)
             db.session.commit()
@@ -316,6 +361,10 @@ def add_shift():
             flash("All fields are required!")
     users = Users.query.all()
     shifts = Shifts.query.all()
+
+    for shift in shifts:
+        shift.date = datetime.strptime(shift.date, '%Y-%m-%d')
+
     today = datetime.now()
     calendar_days = [today + timedelta(days=i) for i in range(7)]  # Generate the next 7 days
     return render_template('add_shift.html', users=users, shifts=shifts, calendar_days=calendar_days)
@@ -328,10 +377,29 @@ def edit_shift(shift_id):
         return redirect(url_for('home'))
     shift = Shifts.query.get_or_404(shift_id)
     if request.method == 'POST':
-        shift.date = request.form.get('date')
-        shift.start_time = request.form.get('start_time')
-        shift.end_time = request.form.get('end_time')
-        if shift.date and shift.start_time and shift.end_time:
+        new_date = request.form.get('date')
+        new_start_time = request.form.get('start_time')
+        new_end_time = request.form.get('end_time')
+
+        if new_date and new_start_time and new_end_time:
+            overlapping_shifts = Shifts.query.filter(
+                Shifts.user_id == shift.user_id,
+                Shifts.date == new_date,
+                Shifts.id != shift.id,
+                db.or_(
+                    db.and_(Shifts.start_time <= new_start_time, Shifts.end_time > new_start_time),
+                    db.and_(Shifts.start_time < new_end_time, Shifts.end_time >= new_end_time),
+                    db.and_(Shifts.start_time >= new_start_time, Shifts.end_time <= new_end_time)
+                )
+            ).all()
+
+            if overlapping_shifts:
+                flash("Shift overlaps with an existing shift for this employee.")
+                return redirect(url_for('edit_shift', shift_id=shift_id))
+
+            shift.date = new_date
+            shift.start_time = new_start_time
+            shift.end_time = new_end_time
             db.session.commit()
             flash("Shift updated successfully!")
             return redirect(url_for('calendar_data_all'))
@@ -349,7 +417,7 @@ def delete_shift(shift_id):
     db.session.delete(shift)
     db.session.commit()
     flash("Shift deleted successfully!")
-    return redirect(url_for('calendar_data_all'))
+    return redirect(url_for('add_shift'))
 
 @app.route('/view_shift_templates')
 def view_shift_templates():
