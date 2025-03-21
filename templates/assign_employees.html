@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign Employees</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Assign Employees to {{ company.name }}</h1>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary" style="margin-bottom: 20px;">Go Back</a>
+        <form method="POST" action="{{ url_for('assign_employees') }}">
+            <label for="employee_id">Select Employee:</label>
+            <select id="employee_id" name="employee_id" required>
+                {% if employees %}
+                    {% for employee in employees %}
+                        <option value="{{ employee.id }}">{{ employee.name }} ({{ employee.email }})</option>
+                    {% endfor %}
+                {% else %}
+                    <option disabled>No employees available</option>
+                {% endif %}
+            </select>
+            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Assign Employee</button>
+        </form>
+    </div>
+</body>
+</html>

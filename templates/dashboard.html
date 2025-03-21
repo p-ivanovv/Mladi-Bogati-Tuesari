@@ -55,20 +55,26 @@
 {% endif %}
 
 {% if current_user.role == 'manager' %}
-<div style="text-align: center; margin-top: 20px;">
-    <a href="{{ url_for('add_shift') }}" class="btn btn-primary">Add Shift</a>
-    <a href="{{ url_for('set_day_override') }}" class="btn btn-secondary">Set Day Override</a>
-    <a href="{{ url_for('set_shift_template') }}" class="btn btn-secondary">Set Shift Template</a>
-    <a href="{{ url_for('view_day_overrides') }}" class="btn btn-secondary">View Day Override</a>
-    <a href="{{ url_for('view_shift_templates') }}" class="btn btn-secondary">View Shift Template</a>
-    <a href="{{ url_for('requests') }}" class="btn btn-secondary">View My Requests</a>
+<h2>Company: {{ company.name }}</h2>
 
-</div>
-{% else %}
-<div style="text-align: center; margin-top: 20px;">
-    <a href="{{ url_for('calendar_data') }}" class="btn btn-primary">View Shifts</a>
-    <a href="{{ url_for('requests_employee') }}" class="btn btn-secondary">View My Requests</a>
-</div>
+<h3>Assign Employees to Your Company</h3>
+<form method="POST">
+    <label for="employee_id">Select Employee:</label>
+    <select name="employee_id">
+        {% for employee in employees %}
+            <option value="{{ employee.id }}">{{ employee.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Add Employee</button>
+</form>
+
+<h3>Current Employees in Your Company</h3>
+<ul>
+    {% for employee in company.employees %}
+        <li>{{ employee.name }} ({{ employee.email }})</li>
+    {% endfor %}
+</ul>
 {% endif %}
+
 </div>
 {% endblock %}
