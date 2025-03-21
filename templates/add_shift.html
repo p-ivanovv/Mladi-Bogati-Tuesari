@@ -5,17 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shift Manager</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/add_shift.css') }}">
-    <style>
-        .modal-content {
-            position: relative;
-            top: -50px;
-        }
-    </style>
+
 </head>
 <body style="background-color: white;">
     {% include 'navbar.html' %}
-    <button id="openModal">Add Shift</button>
-    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary" style="margin-left: 10px;">Go Home</a>
+    <div class="header-container">
+        <h2>Shift Calendar</h2>
+        <button id="openModal" class="btn btn-primary">Add Shift</button>
+        <a href="{{ url_for('dashboard') }}"><button>Go Home</button></a>
+    </div>
     
     <div id="shiftModal" class="modal">
         <div class="modal-content">
@@ -51,8 +49,9 @@
         </div>
     </div>
 
-    <h2>Shift Calendar</h2>
-    {% include 'calendar.html' %}
+    <div class="calendar-container">
+        {% include 'calendar.html' %}
+    </div>
 
     <script>
         var modal = document.getElementById("shiftModal");

@@ -1,62 +1,92 @@
+/* Global Styling */
 body, html {
     height: 100%;
     margin: 0;
     font-family: 'Poppins', sans-serif;
-    background-color: #080710;
-    overflow: hidden;
+    background: linear-gradient(to right, #141E30, #243B55);
+    color: #ffffff;
 }
 
+/* Container for Forms */
 .container {
+    position: relative;
     max-width: 600px;
     margin: 50px auto;
     padding: 20px;
-    background-color: rgba(255, 255, 255, 0.13);
-    box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
     border-radius: 10px;
     backdrop-filter: blur(10px);
     border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-h1 {
-    text-align: center;
-    font-family: 'Poppins', sans-serif;
-    color: #ffffff;
+/* Header Section */
+.header-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 20px 50px;
+    gap: 15px;
+    margin-left: 320px
 }
 
+.header-container h2 {
+    margin-right: auto;
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #f1c40f;
+}
+
+/* Form Styling */
 form {
     display: flex;
     flex-direction: column;
 }
 
 label {
-    margin-bottom: 10px;
     font-weight: bold;
-    color: #ffffff;
+    margin-bottom: 5px;
 }
 
 input, select {
-    margin-bottom: 20px;
     padding: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.1); /* Darker background */
+    margin-bottom: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
+    font-size: 14px;
 }
 
-button {
-    padding: 10px;
-    background-color: #ffffff;
+input::placeholder, select {
+    color: #cccccc;
+}
+
+.calendar-container {
+    margin-left: 320px !important;
+}
+
+/* Button Styling */
+button, .btn {
+    padding: 10px 15px;
+    background: #f1c40f;
     color: #080710;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
     font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.3s;
 }
 
-button:hover {
-    background-color: #D0B8A8;
+button:hover, .btn:hover {
+    background: #d4ac0d;
+    transform: scale(1.05);
 }
 
+/* Modal Styling */
 .modal {
     display: none;
     position: fixed;
@@ -65,19 +95,18 @@ button:hover {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.7);
 }
 
 .modal-content {
-    background-color: rgba(255, 255, 255, 0.13);
+    background: rgba(255, 255, 255, 0.15);
     margin: 10% auto;
     padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    width: 50%;
+    width: 40%;
     border-radius: 10px;
     text-align: center;
     backdrop-filter: blur(10px);
-    box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
 .close {
@@ -87,35 +116,77 @@ button:hover {
     color: #ffffff;
 }
 
+/* Calendar Container */
+.calendar-container {
+    max-width: 900px;
+    margin-left: 200px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
+
+}
+
+/* Weekday Header */
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+    color: #f1c40f;
+}
+
+/* Calendar Grid */
 .calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-    margin-top: 20px;
-    height: calc(100vh - 230px);
-}
-
-.day {
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 8px;
     padding: 10px;
-    text-align: center;
-    background-color: rgba(200, 200, 200, 0.4); /* Slightly darker gray, transparent */
-    backdrop-filter: blur(5px); /* Blurred */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    border-radius: 8px;
-    color: #ffffff;
 }
 
-.shift {
-    margin-top: 2px;
-    padding: 5px;
-    background-color: rgba(255, 255, 255, 0.13);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+/* Individual Day Box */
+.day {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    min-height: 120px;
     border-radius: 5px;
-    font-size: 0.9em;
-    cursor: pointer;
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    text-align: left;
+    color: white;
+    font-size: 14px;
+    transition: 0.3s;
 }
 
+.day:hover {
+    background: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+}
+
+/* Today's Date Highlight */
+.today {
+    background: rgba(255, 255, 255, 0.4);
+    font-weight: bold;
+    border: 2px solid #ffcc00;
+    box-shadow: 0 0 10px #ffcc00;
+}
+
+/* Shift Styling */
+.shift {
+    background: #ff9800;
+    color: white;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 0.8em;
+    margin-top: 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.shift:hover {
+    background: #e68900;
+    transform: scale(1.05);
+}

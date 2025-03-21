@@ -265,7 +265,7 @@ def set_company_policy():
 @login_required
 def dashboard():
     company = None
-    employees = []
+    employees = []  # Ensure employees is always defined
 
     if current_user.role == 'manager':
         company = Company.query.filter_by(manager_id=current_user.id).first()
