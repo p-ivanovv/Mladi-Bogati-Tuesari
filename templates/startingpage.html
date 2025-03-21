@@ -1,60 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bobche</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Merienda:wght@300..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Poiret+One&family=Tektur:wght@400..900&family=UnifrakturMaguntia&display=swap" rel="stylesheet"> 
-</head>
-<body>
-    <video autoplay muted loop class="video-bg">
-        <source src="{{ url_for('static', filename='videos/LTE.mp4') }}" type="video/mp4">                                   
-        Your browser does not support HTML5 video.
-    </video>
-    <div class="overlay"></div>
-    <div class="logo" style="text-align: center; margin-top: 175px;">
-        <img src="{{ url_for('static', filename='images/bobche_logo2.png') }}" alt="Bobche Logo" style="width: 500px; height: auto;">
-    </div>
-    <div class="content">
-        <p id="animatedText" style="text-align: center;font-weight: bold; font-size: 5em; font-family: 'Poiret One', cursive;" class="animate__animated animate__fadeIn">Time is your ally. Use it wisely.</p>
-        <div class="buttons">
-            <a href="#" class="btn" id="loginBtn">Log In</a>
-            <a href="#" class="btn" id="registerBtn">Sign Up</a>
+<html>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bobche</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Merienda:wght@300..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Tektur:wght@400..900&display=swap" rel="stylesheet"> 
+    </head>
+    <body>
+        <video autoplay muted loop class="video-bg">
+            <source src="{{ url_for('static', filename='videos/LTE.mp4') }}" type="video/mp4">                                   
+            Your browser does not support HTML5 video.
+        </video>
+        <div class="overlay"></div>
+        <div class="content">
+            <h1>Bobche</h1>
+            <div class="buttons">
+                <a href="{{ url_for('login') }}" class="btn">Log In</a>
+                <a href="{{ url_for ('register') }}" class="btn">Sign Up</a>
+            </div>
         </div>
-    </div>
-
-    <script>
-        // Вземаме елементите
-        const loginBtn = document.getElementById("loginBtn");
-        const registerBtn = document.getElementById("registerBtn");
-        const animatedText = document.getElementById("animatedText");
-
-        // Функция за добавяне на FadeOut анимация и редирект
-        function redirectWithFadeOut(url) {
-            // Добавяме анимацията за FadeOut
-            animatedText.classList.remove("animate__fadeIn");
-            animatedText.classList.add("animate__fadeOut");
-
-            // Изчакваме анимацията да завърши, преди да редиректнем
-            setTimeout(function() {
-                window.location.href = url;
-            }, 500);  // 1000 милисекунди (1 секунда) за изчакване на анимацията
-        }
-
-        // Добавяме event listeners за бутоните
-        loginBtn.addEventListener("click", (e) => {
-            e.preventDefault(); // предотвратява навигацията веднага
-            redirectWithFadeOut("{{ url_for('login') }}");
-        });
-
-        registerBtn.addEventListener("click", (e) => {
-            e.preventDefault(); // предотвратява навигацията веднага
-            redirectWithFadeOut("{{ url_for('register') }}");
-        });
-    </script>
-</body>
-</html>
+    </body>
+        </html>
