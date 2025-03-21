@@ -1,101 +1,112 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container animate__animated animate__fadeIn" style="text-align: center; position: relative; z-index: 1;">
+<div class="container animate__animated animate__fadeIn" style="max-width: 900px; margin-top: 20px;">
 
-    
-
-    <h2>Dashboard</h2>
-    <br/>
+    <!-- Flash Messages -->
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-info alert-dismissible fade show shadow" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
 
     <!-- User Details -->
-    <div class="card user-details" style="width: 50%; margin: 0 auto;">
-        <div class="card-header">User Details</div>
+    <div class="card shadow-lg border-0 rounded-lg text-center">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Welcome, {{ current_user.name }}!</h3>
+        </div>
         <div class="card-body">
-            <p><strong>Name:</strong> {{ current_user.name }}</p>
-            <p><strong>Username:</strong> {{ current_user.username }}</p>
-            <p><strong>Role:</strong> {{ current_user.role.capitalize() }}</p>
+            <p><i class="fas fa-user-circle fa-lg text-primary"></i> <strong>Username:</strong> {{ current_user.username }}</p>
+            <p><i class="fas fa-user-tag fa-lg text-success"></i> <strong>Role:</strong> {{ current_user.role.capitalize() }}</p>
 
             {% if current_user.role == 'manager' %}
-                <p><strong>Company:</strong> {{ company.name if company else "None" }}</p>
+                <p><i class="fas fa-building fa-lg text-warning"></i> <strong>Company:</strong> 
+                    <span class="badge bg-secondary">{{ company.name if company else "None" }}</span>
+                </p>
             {% elif current_user.role == 'employee' %}
-                <p><strong>Company:</strong> {{ current_user.company.name if current_user.company else "None" }}</p>
+                <p><i class="fas fa-building fa-lg text-warning"></i> <strong>Company:</strong> 
+                    <span class="badge bg-secondary">{{ current_user.company.name if current_user.company else "None" }}</span>
+                </p>
             {% endif %}
         </div>
     </div>
 
-    <!-- Manager Section -->
     {% if current_user.role == 'manager' %}
-        <h2 class="mt-4">Manager Dashboard</h2>
+        <h3 class="mt-4 text-center text-primary">Manager Dashboard</h3>
 
         <!-- Create Company -->
         {% if not company %}
-            <div class="card mt-4" style="width: 50%; margin: 0 auto;">
-                <div class="card-header">Create a Company</div>
+            <div class="card shadow-lg border-0 rounded-lg mt-4">
+                <div class="card-header bg-dark text-white text-center">
+                    <h5>Create a Company</h5>
+                </div>
                 <div class="card-body">
                     <form method="POST">
                         <div class="mb-3">
                             <label for="company_name" class="form-label">Company Name:</label>
                             <input type="text" id="company_name" name="company_name" class="form-control" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Create Company</button>
+                        <button type="submit" class="btn btn-primary w-100">Create Company</button>
                     </form>
                 </div>
             </div>
         {% else %}
-            <h3>Company: {{ company.name }}</h3>
-
-            <!-- Assign Employees -->
-            <div class="card mt-3" style="width: 50%; margin: 0 auto;">
-                <div class="card-header">Assign Employees to Your Company</div>
+            <div class="card shadow-lg border-0 rounded-lg mt-4">
+                <div class="card-header bg-secondary text-white text-center">
+                    <h5>Company: {{ company.name }}</h5>
+                </div>
                 <div class="card-body">
+                    <h6 class="text-center">Assign Employees</h6>
                     {% if employees %}
                         <form method="POST">
-                            <label for="employee_id">Select Employee:</label>
-                            <select name="employee_id" class="form-select">
-                                {% for employee in employees %}
-                                    <option value="{{ employee.id }}">{{ employee.name }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn btn-success mt-2">Add Employee</button>
+                            <div class="input-group mb-3">
+                                <select name="employee_id" class="form-select">
+                                    {% for employee in employees %}
+                                        <option value="{{ employee.id }}">{{ employee.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-success">Add</button>
+                            </div>
                         </form>
                     {% else %}
-                        <p class="text-muted">No available employees to assign.</p>
+                        <p class="text-muted text-center">No available employees to assign.</p>
                     {% endif %}
                 </div>
             </div>
 
             <!-- Current Employees -->
-            <div class="card mt-3" style="width: 50%; margin: 0 auto;">
-                <div class="card-header">Current Employees in {{ company.name }}</div>
+            <div class="card shadow-lg border-0 rounded-lg mt-4">
+                <div class="card-header bg-info text-white text-center">
+                    <h5>Current Employees</h5>
+                </div>
                 <div class="card-body">
                     {% if company.employees %}
                         <ul class="list-group">
                             {% for employee in company.employees %}
-                                <li class="list-group-item">{{ employee.name }} ({{ employee.email }})</li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ employee.name }} ({{ employee.email }})
+                                    <span class="badge bg-primary">{{ employee.skill or "No Skill Assigned" }}</span>
+                                </li>
                             {% endfor %}
                         </ul>
                     {% else %}
-                        <p class="text-muted">No employees assigned yet.</p>
+                        <p class="text-muted text-center">No employees assigned yet.</p>
                     {% endif %}
                 </div>
             </div>
         {% endif %}
     {% endif %}
-
 </div>
 
 <!-- JavaScript to Auto-Close Flash Messages -->
 <script>
     setTimeout(() => {
-        let alerts = document.querySelectorAll(".alert");
-        alerts.forEach(alert => {
+        document.querySelectorAll(".alert").forEach(alert => {
             let closeButton = alert.querySelector(".btn-close");
-            if (closeButton) {
-                closeButton.click(); // Simulate close button click
-            }
+            if (closeButton) closeButton.click();
         });
-    }, 5000); // Auto-close after 5 seconds
+    }, 5000);
 </script>
 
 {% endblock %}
