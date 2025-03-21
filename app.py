@@ -322,12 +322,12 @@ def add_shift():
         flash("Access Denied: Only managers can add shifts.")
         return redirect(url_for('home'))
     if request.method == 'POST':
-        shift_id = request.form.get('shift_id')  # Get the shift ID if editing
+        shift_id = request.form.get('shift_id')
         date = request.form.get('date')
         start_time = request.form.get('start_time')
         end_time = request.form.get('end_time')
         user_id = request.form.get('user_id')
-        day = datetime.strptime(date, '%Y-%m-%d').strftime('%A')  # Get the day of the week
+        day = datetime.strptime(date, '%Y-%m-%d').strftime('%A')
 
         if date and start_time and end_time and user_id and day:
             shift_year = datetime.strptime(date, '%Y-%m-%d').year
@@ -359,7 +359,6 @@ def add_shift():
                 flash("Shift overlaps with an existing shift for this employee.")
                 return redirect(url_for('add_shift'))
 
-            # Add the new shift
             new_shift = Shifts(date=date, start_time=start_time, end_time=end_time, user_id=user_id, day=day)
             db.session.add(new_shift)
             db.session.commit()
