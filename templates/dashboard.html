@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="container" style="display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center;"> <!-- Add text-align: center here -->
 {% for message in get_flashed_messages() %}
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
         {{ message }}
@@ -11,7 +12,7 @@
 <h2>Dashboard</h2>
 <br/>
 
-<div class="card">
+<div class="card user-details"> <!-- Add the user-details class here -->
     <div class="card-header">
         User Details
     </div>
@@ -64,9 +65,8 @@
 </div>
 {% else %}
 <div style="text-align: center; margin-top: 20px;">
-	<a href="{{ url_for('calendar_data') }}" class="btn btn-primary">Veiw Shifts</a>
-
+	<a href="{{ url_for('calendar_data') }}" class="btn btn-primary">View Shifts</a>
+</div>
 {% endif %}
-
-
+</div> <!-- Add this line -->
 {% endblock %}
