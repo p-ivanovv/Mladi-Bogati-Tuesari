@@ -113,6 +113,7 @@
 
         <label for="password">{{ form.password.label }}</label>
         {{ form.password(class="form-control", placeholder="Password") }}
+        <p style="text-align: center; margin-top: 10px;">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
 
         <button type="submit">Log In</button>
     </form>
