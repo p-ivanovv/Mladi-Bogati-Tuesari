@@ -26,8 +26,13 @@ class Users(db.Model, UserMixin):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password_hash = db.Column(db.String(128))
     role = db.Column(db.String(20), nullable=False, default='employee')
-    shifts = db.relationship('Shifts', backref='user', lazy=True)
     skill = db.Column(db.String(200), nullable=True)
+    
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)  # Explicit Foreign Key
+
+    company = db.relationship('Company', backref='employees', foreign_keys=[company_id])  # Explicitly set FK
+
+
 
     @property
     def password(self):
@@ -50,11 +55,12 @@ class Shifts(db.Model):
     day = db.Column(db.String(20), nullable=False)
     start_time = db.Column(db.String(20), nullable=False)
     end_time = db.Column(db.String(20), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    skill = db.Column(db.String(100), nullable=False)  
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))  # Foreign key to Users
+    skill = db.Column(db.String(100), nullable=False)
 
-    def __repr__(self):
-        return '<Shift %r>' % self.id
+    # Define relationship to Users
+    user = db.relationship('Users', backref='shifts', foreign_keys=[user_id])
+
     
 class TimeOffRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -92,11 +98,13 @@ class CompanyConfig(db.Model):
     works_on_weekends = db.Column(db.Boolean, nullable=False, default=False)
 
 class Company(db.Model):
+    __tablename__ = 'company'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False, unique=True)
     manager_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    work_on_weekends = db.Column(db.Boolean, default=False)
-    employees = db.relationship('Users', backref='company', lazy=True)
+
+    manager = db.relationship('Users', backref='managed_company', foreign_keys=[manager_id])
+
 
 with app.app_context():
 	db.create_all()
@@ -249,24 +257,41 @@ def set_company_policy():
 @login_required
 def dashboard():
     company = None
+    employees = []
+
     if current_user.role == 'manager':
         company = Company.query.filter_by(manager_id=current_user.id).first()
+
         if request.method == 'POST':
+            # First, check if the manager is trying to create a company
             company_name = request.form.get('company_name')
-            work_on_weekends = request.form.get('work_on_weekends') == 'on'
-            if company_name:
-                new_company = Company(
-                    name=company_name,
-                    manager_id=current_user.id,
-                    work_on_weekends=work_on_weekends
-                )
-                db.session.add(new_company)
+            if company_name and not company:
+                company = Company(name=company_name, manager_id=current_user.id)
+                db.session.add(company)
                 db.session.commit()
-                flash("Company created successfully!")
-                return redirect(url_for('dashboard'))
+                flash(f"Company '{company_name}' created successfully!", "success")
+                return redirect(url_for('dashboard'))  # Refresh page
+
+            # If the manager is assigning an employee to the company
+            employee_id = request.form.get('employee_id')
+            if employee_id and company:
+                employee = Users.query.get(employee_id)
+                if employee:
+                    employee.company_id = company.id
+                    db.session.commit()
+                    flash(f"{employee.name} has been added to {company.name}!", "success")
+                else:
+                    flash("Invalid employee selected.", "danger")
+            elif employee_id and not company:
+                flash("Please create a company first before assigning employees.", "danger")
+
+        employees = Users.query.filter_by(company_id=None, role='employee').all()
+
     elif current_user.role == 'employee':
-        company = current_user.company
-    return render_template('dashboard.html', company=company)
+        company = Company.query.get(current_user.company_id)
+
+    return render_template('dashboard.html', company=company, employees=employees)
+
 
 @app.route('/requests_employee', methods=['GET', 'POST'])
 @login_required
@@ -761,14 +786,14 @@ def generate_schedule_route():
 
     return redirect('/view_schedule')
 
-
-@app.route('/view_schedule', methods=['GET'])
+@app.route('/view_schedule')
+@login_required
 def view_schedule():
     if current_user.role != 'manager': 
-        flash("Access Denied: Only managers can view schedules.")
+        flash("Access Denied: Only managers can view schedule.")
         return redirect(url_for('home'))
-
-    shifts = Shifts.query.all()
+    shifts = Shifts.query.options(joinedload(Shifts.user)).all()
+    print("Shifts:", shifts)  
     return render_template('schedule.html', shifts=shifts)
 
 if __name__ == '__main__':

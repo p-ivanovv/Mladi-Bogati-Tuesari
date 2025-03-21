@@ -6,6 +6,7 @@
     <title>Edit Shift</title>
 </head>
 <body>
+    {% include 'navbar.html' %}
     <h1>Edit Shift</h1>
     <form method="POST" action="{{ url_for('edit_shift', shift_id=shift.id) }}">
         <label for="date">Date:</label>

@@ -1,7 +1,8 @@
 body, html {
     height: 100%;
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Poppins', sans-serif;
+    background-color: #080710;
     overflow: hidden;
 }
 
@@ -9,15 +10,17 @@ body, html {
     max-width: 600px;
     margin: 50px auto;
     padding: 20px;
-    background-color: #DFD3C3;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.13);
+    box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 h1 {
     text-align: center;
-    font-family: 'Merienda', cursive;
-    color: #7D6E83;
+    font-family: 'Poppins', sans-serif;
+    color: #ffffff;
 }
 
 form {
@@ -28,21 +31,22 @@ form {
 label {
     margin-bottom: 10px;
     font-weight: bold;
-    color: #7D6E83;
+    color: #ffffff;
 }
 
 input, select {
     margin-bottom: 20px;
     padding: 10px;
-    border: 1px solid #D0B8A8;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 4px;
-    background-color: #F8EDE3;
+    background-color: rgba(255, 255, 255, 0.07);
+    color: #ffffff;
 }
 
 button {
     padding: 10px;
-    background-color: #7D6E83;
-    color: #fff;
+    background-color: #ffffff;
+    color: #080710;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -63,21 +67,24 @@ button:hover {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
 }
-/*testvam neshto*/
+
 .modal-content {
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.13);
     margin: 10% auto;
     padding: 20px;
-    border: 1px solid #888;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     width: 50%;
     border-radius: 10px;
     text-align: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
 }
 
 .close {
     float: right;
     font-size: 28px;
     cursor: pointer;
+    color: #ffffff;
 }
 
 .calendar {
@@ -89,23 +96,25 @@ button:hover {
 }
 
 .day {
-    border: 1px solid #ccc;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 10px;
     text-align: center;
-    background-color: #DFD3C3;
+    background-color: rgba(255, 255, 255, 0.07);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     border-radius: 8px;
+    color: #ffffff;
 }
 
 .shift {
     margin-top: 2px;
     padding: 5px;
-    background-color: #D1ECF1;
-    border: 1px solid #bee5eb;
+    background-color: rgba(255, 255, 255, 0.13);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 5px;
     font-size: 0.9em;
     cursor: pointer;
+    color: #ffffff;
 }
 
