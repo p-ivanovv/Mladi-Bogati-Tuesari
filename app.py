@@ -15,15 +15,6 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SECRET_KEY'] = "samo levski"
 
-app.logger.setLevel(logging.DEBUG)  # Set logging level to DEBUG
-
-# Add a StreamHandler to output logs to the console
-handler = logging.StreamHandler(sys.stdout)
-handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-app.logger.addHandler(handler)
-
 db = SQLAlchemy()
 db.init_app(app)
 
@@ -120,21 +111,27 @@ def load_user(user_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-	form = LoginForm()
-	if form.validate_on_submit():
-		username = request.form['username']
-		user = Users.query.filter_by(username=username).first()
-		if user:
-			if check_password_hash(user.password_hash, form.password.data):
-				login_user(user)
-				flash("Login Succesfull")
-				session['username'] = username
-				return redirect(url_for('dashboard'))
-			else:
-				flash("Wrong Password - Try Again")
-		else:
-			flash("User Not Found - Try Again")
-	return render_template('login.html', form=form)
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = request.form['username']
+        user = Users.query.filter_by(username=username).first()
+        if user:
+            print(f"User found: {user}")  # Debugging: Print user details
+            if check_password_hash(user.password_hash, form.password.data):
+                login_user(user)
+                flash("Login Successful")
+                session['username'] = username
+                print("Login successful, redirecting to dashboard.")  # Debugging
+                return redirect(url_for('dashboard'))
+            else:
+                flash("Wrong Password - Try Again")
+                print("Wrong password.")  # Debugging
+        else:
+            flash("User Not Found - Try Again")
+            print("User not found.")  # Debugging
+    else:
+        print("Form validation failed.")  # Debugging
+    return render_template('login.html', form=form)
 
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
@@ -189,22 +186,35 @@ def delete(id):
 def register():
     name = None
     form = UserForm()
-    if form.validate_on_submit():  
+    if form.validate_on_submit():
+        print("Form validated successfully.")  # Debugging
         user = Users.query.filter_by(email=form.email.data).first()
-        if user is None:  
-            hashed_pw = generate_password_hash(form.password_hash.data)
-            user = Users(
-                username=form.username.data,
-                name=form.name.data,
-                email=form.email.data,
-                password_hash=hashed_pw,
-                role=form.role.data,
-                skill=form.skill.data
-            )
-            db.session.add(user)  
-            db.session.commit()  
-            flash("User Added Successfully")
-            return redirect(url_for('login')) 
+        if user is None:
+            try:
+                hashed_pw = generate_password_hash(form.password_hash.data)
+                user = Users(
+                    username=form.username.data,
+                    name=form.name.data,
+                    email=form.email.data,
+                    password_hash=hashed_pw,
+                    role=form.role.data,
+                    skill=form.skill.data
+                )
+                db.session.add(user)
+                db.session.commit()
+                print(f"User {user.username} added successfully.")  # Debugging
+                flash("User Added Successfully")
+                return redirect(url_for('login'))
+            except Exception as e:
+                db.session.rollback()
+                print(f"Error adding user: {e}")  # Debugging
+                flash("An error occurred while adding the user. Please try again.")
+        else:
+            print("User with this email already exists.")  # Debugging
+            flash("A user with this email already exists.")
+    else:
+        print("Form validation failed.")  # Debugging
+        print("Form errors:", form.errors)  # Debugging
 
     return render_template("register.html", form=form, name=name)
 
@@ -563,7 +573,6 @@ def build_weekly_requirements(works_on_weekends):
 def generate_schedule(works_on_weekends):
     model = cp_model.CpModel()
 
-    # Fetch data
     employees = Users.query.filter_by(role="employee").all()
     shift_templates = ShiftTemplate.query.all()
     day_overrides = DaySpecificOverride.query.all()
@@ -578,14 +587,12 @@ def generate_schedule(works_on_weekends):
     employee_ids = [emp.id for emp in employees]
     employee_skills = {emp.id: emp.skill for emp in employees}
 
-    # Build a map of time off for employees
     time_off_map = {emp.id: [] for emp in employees}
     for request in approved_time_offs:
         time_off_map[request.user_id].append((request.start_date, request.end_date))
 
     shifts_needed = {"weekday": {}, "weekend": {}}
 
-    # Map short day names to full day names
     day_name_map = {
         "Mon": "Monday", "Tue": "Tuesday", "Wed": "Wednesday",
         "Thu": "Thursday", "Fri": "Friday", "Sat": "Saturday", "Sun": "Sunday"
@@ -601,7 +608,6 @@ def generate_schedule(works_on_weekends):
                 key = (day, template.start_time, template.end_time, template.skill)
                 shifts_needed["weekend"][key] = template.required_employees
 
-    # Apply day-specific overrides
     for override in day_overrides:
         full_day_name = day_name_map.get(override.day, override.day)
         override_key = (full_day_name, override.start_time, override.end_time, override.skill)
@@ -612,7 +618,6 @@ def generate_schedule(works_on_weekends):
             shifts_needed["weekend"].setdefault(override_key, 0)
             shifts_needed["weekend"][override_key] += override.required_employees
 
-    # Define decision variables
     employee_shifts = {}
     total_shifts = {emp_id: model.NewIntVar(0, len(shifts_needed["weekday"]) + len(shifts_needed["weekend"]), f"total_shifts_{emp_id}") for emp_id in employee_ids}
 
@@ -622,7 +627,6 @@ def generate_schedule(works_on_weekends):
                 f"emp_{emp_id}_day_{day_name}_{start_time}_{end_time}_{skill}"
             )
 
-    # Staffing constraints
     for (day_name, start_time, end_time, skill), num_employees in shifts_needed["weekday"].items():
         model.Add(
             sum(
@@ -635,7 +639,6 @@ def generate_schedule(works_on_weekends):
             >= num_employees
         )
 
-    # Fairness constraint
     model.AddMaxEquality(
         max_shifts := model.NewIntVar(0, len(shifts_needed["weekday"]) + len(shifts_needed["weekend"]), "max_shifts"),
         [total_shifts[emp_id] for emp_id in employee_ids]
@@ -646,7 +649,6 @@ def generate_schedule(works_on_weekends):
     )
     model.Add(max_shifts - min_shifts <= 1)
 
-    # Solve the model
     solver = cp_model.CpSolver()
     status = solver.Solve(model)
 
