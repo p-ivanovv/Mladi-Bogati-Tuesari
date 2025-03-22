@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shift Manager</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/add_shift.css') }}">
-
+    <style>
+        body{
+            overflow-y: scroll;
+        }
+        .modal-content {
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body style="background-color: white;">
     {% include 'navbar.html' %}
@@ -52,6 +61,8 @@
     <div class="calendar-container">
         {% include 'calendar.html' %}
     </div>
+    <div class="container">
+        <a href="{{url_for('generate_schedule_route')}}"class="btn btn-primary">Use the MODERN way</a>
 
     <script>
         var modal = document.getElementById("shiftModal");
