@@ -191,6 +191,17 @@
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     {{ employee.name }} ({{ employee.email }})
                                     <span class="badge bg-primary">{{ employee.skill or "No Skill Assigned" }}</span>
+                                    <div>
+                                        <!-- Set Skill -->
+                                        <form action="{{ url_for('set_skill', employee_id=employee.id) }}" method="POST" style="display: inline;">
+                                            <input type="text" name="skill" placeholder="Set Skill" class="form-control d-inline w-auto" required>
+                                            <button type="submit" class="btn btn-primary btn-sm">Set Skill</button>
+                                        </form>
+                                        <!-- Remove Employee -->
+                                        <form action="{{ url_for('remove_employee', employee_id=employee.id) }}" method="POST" style="display: inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                        </form>
+                                    </div>
                                 </li>
                             {% endfor %}
                         </ul>

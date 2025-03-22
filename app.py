@@ -206,7 +206,6 @@ def register():
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         role = request.form.get('role')
-        skill = request.form.get('skill')
 
         if not username or not email or not password or not confirm_password or not role:
             flash("All fields are required!")
@@ -227,7 +226,6 @@ def register():
             email=email,
             password_hash=hashed_password,
             role=role,
-            skill=skill,
             name=username  
         )
         db.session.add(new_user)
@@ -237,6 +235,7 @@ def register():
         return redirect(url_for('login'))
 
     return render_template("register.html")
+
 
 @app.route('/set_company_policy', methods=['GET', 'POST'])
 def set_company_policy():
@@ -295,6 +294,62 @@ def dashboard():
         company = Company.query.get(current_user.company_id)
 
     return render_template('dashboard.html', company=company, employees=employees)
+
+@app.route('/remove_employee/<int:employee_id>', methods=['POST'])
+@login_required
+def remove_employee(employee_id):
+    if current_user.role != 'manager':
+        flash("Access Denied: Only managers can remove employees.")
+        return redirect(url_for('dashboard'))
+
+    company = Company.query.filter_by(manager_id=current_user.id).first()
+
+    if not company:
+        flash("You need to create a company first!", "warning")
+        return redirect(url_for('dashboard'))
+
+    employee = Users.query.filter_by(id=employee_id, company_id=company.id).first()
+
+    if not employee:
+        flash("Employee not found or does not belong to your company.", "danger")
+        return redirect(url_for('dashboard'))
+
+    employee.company_id = None
+    employee._skill = None
+    db.session.commit()
+
+    flash(f"{employee.name} has been removed from your company.", "success")
+    return redirect(url_for('dashboard'))
+
+@app.route('/set_skill/<int:employee_id>', methods=['POST'])
+@login_required
+def set_skill(employee_id):
+    if current_user.role != 'manager':
+        flash("Access Denied: Only managers can set skills.")
+        return redirect(url_for('dashboard'))
+
+    company = Company.query.filter_by(manager_id=current_user.id).first()
+
+    if not company:
+        flash("You need to create a company first!", "warning")
+        return redirect(url_for('dashboard'))
+
+    employee = Users.query.filter_by(id=employee_id, company_id=company.id).first()
+
+    if not employee:
+        flash("Employee not found or does not belong to your company.", "danger")
+        return redirect(url_for('dashboard'))
+
+    skill = request.form.get('skill')
+    if not skill:
+        flash("Skill cannot be empty.", "danger")
+        return redirect(url_for('dashboard'))
+
+    employee.skill = skill
+    db.session.commit()
+
+    flash(f"Skill for {employee.name} has been updated to {skill}.", "success")
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/requests_employee', methods=['GET', 'POST'])
