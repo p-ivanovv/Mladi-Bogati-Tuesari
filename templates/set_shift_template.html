@@ -12,7 +12,23 @@
             align-items: center;
             height: calc(100vh - 60px); /* Adjust height based on navbar height */
         }
-        body{
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        .form-container label, .form-container input, .form-container button {
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 16px; /* Increase text size */
+        }
+        .form-container h1 {
+            font-size: 26px; /* Slightly larger font size for the title */
+            margin-bottom: 20px; /* Add some space below the title */
+        }
+        body {
             overflow-y: scroll;
         }
     </style>
@@ -20,14 +36,13 @@
 <body>
     {% include 'navbar.html' %}
     <div class="form-container">
-        <h1>Set Shift Template</h1>
         <form method="POST" action="{{ url_for('set_shift_template') }}">
-            <label for="template_name">Template Name:</label>
-            <input type="text" id="template_name" name="template_name" required><br>
+            <h1>Template Name</h1>
+            <input type="text" id="template_name" name="template_name"style= rgba(0, 0, 0, 0) required>
             <label for="start_time">Start Time:</label>
-            <input type="time" id="start_time" name="start_time" required><br>
+            <input type="time" id="start_time" name="start_time" style= rgba(0) required>
             <label for="end_time">End Time:</label>
-            <input type="time" id="end_time" name="end_time" required><br>
+            <input type="time" id="end_time" name="end_time"style= rgba(0) required>
             <button type="submit">Save Template</button>
         </form>
     </div>

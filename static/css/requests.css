@@ -55,26 +55,13 @@ th, td {
 
 th {
     background-color: #f4f4f4;
-    color: #000;
+    color: #bdb4b4;
 }
 
 tr:nth-child(even) {
     background-color: #f9f9f9;
 }
-
-/* Button Styling */
-button, .btn {
-    padding: 10px 15px;
-    background: #f1c40f;
-    color: #080710;
-    font-size: 16px;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: 0.3s;
-}
+    
 
 button:hover, .btn:hover {
     background: #d4ac0d;
