@@ -5,80 +5,111 @@
   <title>CodePen - Sticky responsive sidenav</title>
   <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap'>
 <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Material+Icons+Round'><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
+  <style>
+    body {
+      overflow-y: scroll;
+    }
+  </style>
 </head>
 <body>
 <nav id="navbar" style="background: rgba(0, 0, 0, 0.83);">
   <ul class="navbar-items flexbox-col">
-    {% if request.endpoint != 'add_shift' %}
-    <li class="navbar-item flexbox-left">
-      <a class="navbar-item-inner flexbox-left" href="{{ url_for('add_shift') }}">
-        <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="add-outline" style="color: #1845ad;"></ion-icon>
-        </div>
-        <span class="link-text" style="color: #1845ad;">Add Shift</span>
-      </a>
-    </li>
-    {% endif %}
-    {% if request.endpoint != 'set_day_override' %}
-    <li class="navbar-item flexbox-left">
-      <a class="navbar-item-inner flexbox-left" href="{{ url_for('set_day_override') }}">
-        <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="calendar-outline" style="color: #1845ad;"></ion-icon>
-        </div>
-        <span class="link-text" style="color: #1845ad;">Set Day Override</span>
-      </a>
-    </li>
-    {% endif %}
-    {% if request.endpoint != 'set_shift_template' %}
-    <li class="navbar-item flexbox-left">
-      <a class="navbar-item-inner flexbox-left" href="{{ url_for('set_shift_template') }}">
-        <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="document-text-outline" style="color: #1845ad;"></ion-icon>
-        </div>
-        <span class="link-text" style="color: #1845ad;">Set Shift Template</span>
-      </a>
-    </li>
-    {% endif %}
-    {% if request.endpoint != 'view_day_overrides' %}
-    <li class="navbar-item flexbox-left">
-      <a class="navbar-item-inner flexbox-left" href="{{ url_for('view_day_overrides') }}">
-        <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="eye-outline" style="color: #ff512f;"></ion-icon>
-        </div>
-        <span class="link-text" style="color: #ff512f;">View Day Override</span>
-      </a>
-    </li>
-    {% endif %}
-    {% if request.endpoint != 'view_shift_templates' %}
-    <li class="navbar-item flexbox-left">
-      <a class="navbar-item-inner flexbox-left" href="{{ url_for('view_shift_templates') }}">
-        <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="layers-outline" style="color: #ff512f;"></ion-icon>
-        </div>
-        <span class="link-text" style="color: #ff512f;">View Shift Template</span>
-      </a>
-    </li>
-    {% endif %}
-    {% if request.endpoint != 'requests' %}
-    <li class="navbar-item flexbox-left">
-      <a class="navbar-item-inner flexbox-left" href="{{ url_for('requests') }}">
-        <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="paper-plane-outline" style="color: #ff512f;"></ion-icon>
-        </div>
-        <span class="link-text" style="color: #ff512f;">View My Requests</span>
-      </a>
-    </li>
-    {% endif %}
-    {% if request.endpoint != 'dashboard' %}
-    <li class="navbar-item flexbox-left">
-      <a class="navbar-item-inner flexbox-left" href="{{ url_for('dashboard') }}">
-        <div class="navbar-item-inner-icon-wrapper flexbox">
-          <ion-icon name="pie-chart-outline" style="color: #ff512f;"></ion-icon>
-        </div>
-        <span class="link-text" style="color: #ff512f;">Dashboard</span>
-      </a>
-    </li>
+    {% if current_user.is_authenticated %}
+      {% if current_user.role == 'manager' %}
+        <!-- Manager buttons -->
+        {% if request.endpoint != 'add_shift' %}
+        <li class="navbar-item flexbox-left">
+          <a class="navbar-item-inner flexbox-left" href="{{ url_for('add_shift') }}">
+            <div class="navbar-item-inner-icon-wrapper flexbox">
+              <ion-icon name="add-outline" style="color: #1845ad;"></ion-icon>
+            </div>
+            <span class="link-text" style="color: #1845ad;">Add Shift</span>
+          </a>
+        </li>
+        {% endif %}
+        {% if request.endpoint != 'set_day_override' %}
+        <li class="navbar-item flexbox-left">
+          <a class="navbar-item-inner flexbox-left" href="{{ url_for('set_day_override') }}">
+            <div class="navbar-item-inner-icon-wrapper flexbox">
+              <ion-icon name="calendar-outline" style="color: #1845ad;"></ion-icon>
+            </div>
+            <span class="link-text" style="color: #1845ad;">Set Day Override</span>
+          </a>
+        </li>
+        {% endif %}
+        {% if request.endpoint != 'set_shift_template' %}
+        <li class="navbar-item flexbox-left">
+          <a class="navbar-item-inner flexbox-left" href="{{ url_for('set_shift_template') }}">
+            <div class="navbar-item-inner-icon-wrapper flexbox">
+              <ion-icon name="document-text-outline" style="color: #1845ad;"></ion-icon>
+            </div>
+            <span class="link-text" style="color: #1845ad;">Set Shift Template</span>
+          </a>
+        </li>
+        {% endif %}
+        {% if request.endpoint != 'view_day_overrides' %}
+        <li class="navbar-item flexbox-left">
+          <a class="navbar-item-inner flexbox-left" href="{{ url_for('view_day_overrides') }}">
+            <div class="navbar-item-inner-icon-wrapper flexbox">
+              <ion-icon name="eye-outline" style="color: #ff512f;"></ion-icon>
+            </div>
+            <span class="link-text" style="color: #ff512f;">View Day Override</span>
+          </a>
+        </li>
+        {% endif %}
+        {% if request.endpoint != 'view_shift_templates' %}
+        <li class="navbar-item flexbox-left">
+          <a class="navbar-item-inner flexbox-left" href="{{ url_for('view_shift_templates') }}">
+            <div class="navbar-item-inner-icon-wrapper flexbox">
+              <ion-icon name="layers-outline" style="color: #ff512f;"></ion-icon>
+            </div>
+            <span class="link-text" style="color: #ff512f;">View Shift Template</span>
+          </a>
+        </li>
+        {% endif %}
+        {% if request.endpoint != 'calendar_data' %}
+        <li class="navbar-item flexbox-left">
+          <a class="navbar-item-inner flexbox-left" href="{{ url_for('calendar_data') }}">
+            <div class="navbar-item-inner-icon-wrapper flexbox">
+              <ion-icon name="calendar-outline" style="color: #1845ad;"></ion-icon>
+            </div>
+            <span class="link-text" style="color: #1845ad;">Calendar</span>
+          </a>
+        </li>
+        {% endif %}
+      {% else %}
+        <!-- Employee buttons -->
+        {% if request.endpoint != 'calendar_data' %}
+        <li class="navbar-item flexbox-left">
+          <a class="navbar-item-inner flexbox-left" href="{{ url_for('calendar_data') }}">
+            <div class="navbar-item-inner-icon-wrapper flexbox">
+              <ion-icon name="calendar-outline" style="color: #1845ad;"></ion-icon>
+            </div>
+            <span class="link-text" style="color: #1845ad;">Calendar</span>
+          </a>
+        </li>
+        {% endif %}
+        {% if request.endpoint != 'dashboard' %}
+        <li class="navbar-item flexbox-left">
+          <a class="navbar-item-inner flexbox-left" href="{{ url_for('dashboard') }}">
+            <div class="navbar-item-inner-icon-wrapper flexbox">
+              <ion-icon name="pie-chart-outline" style="color: #ff512f;"></ion-icon>
+            </div>
+            <span class="link-text" style="color: #ff512f;">Dashboard</span>
+          </a>
+        </li>
+        {% endif %}
+        {% if request.endpoint != 'requests_employee' %}
+        <li class="navbar-item flexbox-left">
+          <a class="navbar-item-inner flexbox-left" href="{{ url_for('requests_employee') }}">
+            <div class="navbar-item-inner-icon-wrapper flexbox">
+              <ion-icon name="paper-plane-outline" style="color: #ff512f;"></ion-icon>
+            </div>
+            <span class="link-text" style="color: #ff512f;">View My Requests</span>
+          </a>
+        </li>
+        {% endif %}
+      {% endif %}
     {% endif %}
   </ul>
   <ul class="navbar-items flexbox-col">

@@ -4,44 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Shift Calendar</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_shift.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar_data.css') }}">
     <script>
         function openRequestForm(date) {
             document.getElementById('requestForm').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
             document.getElementById('timeOffDate').value = date;
         }
 
         function closeRequestForm() {
             document.getElementById('requestForm').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
         }
     </script>
-    <style>
-        .request-form {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
-            border-radius: 5px;
+      <style>
+        body {
+          overflow-y: scroll;
         }
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-        }
-    </style>
+      </style>
 </head>
 <body>
+    {% include 'navbar.html' %}
     <div class="container">
         <h1>Your Shift Calendar</h1>
-        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary" style="display: block; text-align: center; margin-bottom: 20px;">Go Home</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Go Home</a>
+
+        <button class="kalendarcho-button">
+            <img src="{{ url_for('static', filename='images/kalendarcho.png') }}" alt="Kalendarcho">
+        </button>
 
         <div class="calendar">
             {% for day in calendar_days %}
@@ -78,5 +68,6 @@
 
     <!-- Overlay to Dim Background -->
     <div class="overlay" id="overlay" onclick="closeRequestForm()"></div>
+
 </body>
 </html>
