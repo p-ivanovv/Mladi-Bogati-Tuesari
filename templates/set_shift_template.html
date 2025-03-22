@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="/static/css/set_day_override.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Shift Template</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <style>
         .form-container {
             display: flex;
@@ -17,23 +20,15 @@
 <body>
     {% include 'navbar.html' %}
     <div class="form-container">
-        <form method="POST">
-            <label for="day_type">Day Type:</label>
-            <input type="text" name="day_type" id="day_type" required>
-
+        <h1>Set Shift Template</h1>
+        <form method="POST" action="{{ url_for('set_shift_template') }}">
+            <label for="template_name">Template Name:</label>
+            <input type="text" id="template_name" name="template_name" required><br>
             <label for="start_time">Start Time:</label>
-            <input type="time" name="start_time" id="start_time" required>
-
+            <input type="time" id="start_time" name="start_time" required><br>
             <label for="end_time">End Time:</label>
-            <input type="time" name="end_time" id="end_time" required>
-
-            <label for="skill">Skill:</label> <!-- Changed from 'role' to 'skill' -->
-            <input type="text" name="skill" id="skill" required>
-
-            <label for="required_employees">Required Employees:</label>
-            <input type="number" name="required_employees" id="required_employees" required>
-
-            <button type="submit">Submit</button>
+            <input type="time" id="end_time" name="end_time" required><br>
+            <button type="submit">Save Template</button>
         </form>
     </div>
 </body>

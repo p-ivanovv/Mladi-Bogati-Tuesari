@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Day Overrides</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <style>
         table {
             width: 100%;
@@ -22,40 +22,39 @@
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        body{
-            overflow-y: scroll;
-        }
     </style>
 </head>
 <body>
     {% include 'navbar.html' %}
-    <h1>Day Overrides</h1>
+    <div class="container">
+        <h1>Day Overrides</h1>
 
-    {% if day_overrides %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Day</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Skill</th> <!-- Changed from 'Role' to 'Skill' -->
-                    <th>Required Employees</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for override in day_overrides %}
+        {% if day_overrides %}
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ override.day }}</td>
-                        <td>{{ override.start_time }}</td>
-                        <td>{{ override.end_time }}</td>
-                        <td>{{ override.skill }}</td> <!-- Changed from 'role' to 'skill' -->
-                        <td>{{ override.required_employees }}</td>
+                        <th>Day</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Skill</th>
+                        <th>Required Employees</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No day overrides found. Please add an override first.</p>
-    {% endif %}
+                </thead>
+                <tbody>
+                    {% for override in day_overrides %}
+                        <tr>
+                            <td>{{ override.day }}</td>
+                            <td>{{ override.start_time }}</td>
+                            <td>{{ override.end_time }}</td>
+                            <td>{{ override.skill }}</td>
+                            <td>{{ override.required_employees }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No day overrides found. Please add an override first.</p>
+        {% endif %}
+    </div>
 </body>
 </html>

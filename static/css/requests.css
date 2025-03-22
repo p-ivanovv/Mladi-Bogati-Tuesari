@@ -1,0 +1,82 @@
+/* Global Styling */
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #0d131e, #101f49);
+    color: #ffffff;
+    overflow-y: scroll;
+}
+
+/* Container for Requests */
+.container {
+    position: relative;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    z-index: 1; /* Ensure the container is on top */
+}
+
+/* Header Section */
+.header-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 20px 50px;
+    gap: 15px;
+    margin-left: 320px;
+}
+
+.header-container h2 {
+    margin-right: auto;
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #f1c40f;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+    color: #000;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Button Styling */
+button, .btn {
+    padding: 10px 15px;
+    background: #f1c40f;
+    color: #080710;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+button:hover, .btn:hover {
+    background: #d4ac0d;
+    transform: scale(1.05);
+}

@@ -4,8 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shift Manager</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_shift.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shift_management.css') }}">
+    <style>
+        body {
+            overflow-y: scroll;
+        }
+        .modal-content {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body style="background-color: white;">
     {% include 'navbar.html' %}
