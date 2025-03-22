@@ -1,23 +1,34 @@
-{% extends 'base.html' %}
-{% block content %}
-<h2>Request Time Off</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Requests</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/requests.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="container">
+        <h1>My Requests</h1>
+        <h2>Request Time Off</h2>
 
-<h3>Your Requests</h3>
-<table>
-    <tr>
-        <th>Start Date</th>
-        <th>End Date</th>
-        <th>Reason</th>
-        <th>Status</th>
-    </tr>
-    {% for request in requests %}
-    <tr>
-        <td>{{ request.start_date }}</td>
-        <td>{{ request.end_date }}</td>
-        <td>{{ request.reason }}</td>
-        <td>{{ request.status }}</td>
-    </tr>
-    {% endfor %}
-</table>
-
-{% endblock %}
+        <h3>Your Requests</h3>
+        <table>
+            <tr>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Reason</th>
+                <th>Status</th>
+            </tr>
+            {% for request in requests %}
+            <tr>
+                <td>{{ request.start_date }}</td>
+                <td>{{ request.end_date }}</td>
+                <td>{{ request.reason }}</td>
+                <td>{{ request.status }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>
