@@ -51,6 +51,11 @@
                             <td>{{ template.end_time }}</td>
                             <td>{{ template.skill }}</td>
                             <td>{{ template.required_employees }}</td>
+                            <td>
+                                <form action="{{ url_for('delete_shift_template', template_id=template.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

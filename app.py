@@ -26,10 +26,9 @@ class Users(db.Model, UserMixin):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password_hash = db.Column(db.String(128))
     role = db.Column(db.String(20), nullable=False, default='employee')
-    _skill = db.Column("skill", db.String(200), nullable=True)  # Internal column for skill
-
-    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)  # Explicit Foreign Key
-    company = db.relationship('Company', backref='employees', foreign_keys=[company_id])  # Explicitly set FK
+    _skill = db.Column("skill", db.String(200), nullable=True)  
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)  
+    company = db.relationship('Company', backref='employees', foreign_keys=[company_id])  
 
     @property
     def skill(self):
@@ -38,7 +37,7 @@ class Users(db.Model, UserMixin):
     @skill.setter
     def skill(self, value):
         if value:
-            self._skill = value.capitalize()  # Capitalize the first letter
+            self._skill = value.capitalize()  
         else:
             self._skill = value
 
@@ -63,10 +62,8 @@ class Shifts(db.Model):
     day = db.Column(db.String(20), nullable=False)
     start_time = db.Column(db.String(20), nullable=False)
     end_time = db.Column(db.String(20), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))  # Foreign key to Users
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))  
     skill = db.Column(db.String(100), nullable=False)
-
-    # Define relationship to Users
     user = db.relationship('Users', backref='shifts', foreign_keys=[user_id])
 
     
@@ -77,8 +74,6 @@ class TimeOffRequest(db.Model):
     end_date = db.Column(db.Date, nullable=False)
     reason = db.Column(db.String(200))
     status = db.Column(db.String(20), default='Pending')
-    
-    # Relationship to Users model
     user = db.relationship('Users', backref='time_off_requests')
 
 
@@ -262,7 +257,7 @@ def set_company_policy():
 @login_required
 def dashboard():
     company = None
-    employees = []  # Ensure employees is always defined
+    employees = [] 
 
     if current_user.role == 'manager':
         company = Company.query.filter_by(manager_id=current_user.id).first()
@@ -497,20 +492,17 @@ def add_shift():
             flash("Start time must be earlier than end time.")
             return redirect(url_for('add_shift'))
 
-        # Ensure the employee is part of the manager's company
         user = Users.query.filter_by(id=user_id, company_id=company.id).first()
         if not user:
             flash("This employee is not part of your company!", "danger")
             return redirect(url_for('add_shift'))
 
-        # Check for approved time-off requests
         time_off_requests = TimeOffRequest.query.filter_by(user_id=user_id, status='Approved').all()
         for request_obj in time_off_requests:
             if request_obj.start_date <= datetime.strptime(date, '%Y-%m-%d').date() <= request_obj.end_date:
                 flash("This employee has an approved time-off request during this time!")
                 return redirect(url_for('add_shift'))
 
-        # Prevent shift overlaps
         overlapping_shifts = Shifts.query.filter(
             Shifts.user_id == user_id,
             Shifts.date == date,
@@ -519,14 +511,13 @@ def add_shift():
                 db.and_(Shifts.start_time < end_time, Shifts.end_time >= end_time),
                 db.and_(Shifts.start_time >= start_time, Shifts.end_time <= end_time)
             )
-        ).filter(Shifts.id != shift_id).all()  # Exclude the current shift being edited
+        ).filter(Shifts.id != shift_id).all()  
 
         if overlapping_shifts:
             flash("Shift overlaps with an existing shift for this employee.")
             return redirect(url_for('add_shift'))
 
-        # Update or create the shift
-        if shift_id:  # Editing an existing shift
+        if shift_id:  
             shift = Shifts.query.get(shift_id)
             if shift:
                 shift.date = date
@@ -535,7 +526,7 @@ def add_shift():
                 shift.user_id = user_id
                 shift.day = day
                 shift.skill = user.skill
-        else:  # Creating a new shift
+        else:  
             shift = Shifts(
                 date=date,
                 start_time=start_time,
@@ -550,7 +541,6 @@ def add_shift():
         flash("Shift updated successfully!" if shift_id else "Shift added successfully!")
         return redirect(url_for('add_shift'))
 
-    # Only show employees from the manager's company
     employees = Users.query.filter_by(company_id=company.id, role='employee').all()
     shifts = Shifts.query.all()
 
@@ -608,6 +598,25 @@ def set_shift_template():
 
     return render_template('set_shift_template.html')
 
+@app.route('/delete_shift_template/<int:template_id>', methods=['POST'])
+@login_required
+def delete_shift_template(template_id):
+    if current_user.role != 'manager':
+        flash("Access Denied: Only managers can delete shift templates.")
+        return redirect(url_for('home'))
+
+    shift_template = ShiftTemplate.query.get_or_404(template_id)
+    try:
+        db.session.delete(shift_template)
+        db.session.commit()
+        flash("Shift template deleted successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("An error occurred while deleting the shift template.", "error")
+        print(f"Error deleting shift template: {e}")
+
+    return redirect(url_for('view_shift_templates'))
+
 @app.route('/view_day_overrides')
 def view_day_overrides():
     if current_user.role != 'manager': 
@@ -617,10 +626,12 @@ def view_day_overrides():
     return render_template('view_day_overrides.html', day_overrides=day_overrides)
 
 @app.route('/set_day_override', methods=['GET', 'POST'])
+@login_required
 def set_day_override():
     if current_user.role != 'manager': 
         flash("Access Denied: Only managers can set day overrides.")
         return redirect(url_for('home'))
+
     if request.method == 'POST':
         day = request.form['day']
         start_time = datetime.strptime(request.form['start_time'], '%H:%M').time()
@@ -628,8 +639,20 @@ def set_day_override():
         skill = request.form['skill']  
         required_employees = int(request.form['required_employees'])
 
+        # Normalize the day name to full day names
+        day_name_map = {
+            "Mon": "Monday",
+            "Tue": "Tuesday",
+            "Wed": "Wednesday",
+            "Thu": "Thursday",
+            "Fri": "Friday",
+            "Sat": "Saturday",
+            "Sun": "Sunday",
+        }
+        full_day_name = day_name_map.get(day, day)  # Convert abbreviated day names to full names
+
         new_override = DaySpecificOverride(
-            day=day,
+            day=full_day_name,  # Save the full day name
             start_time=start_time,
             end_time=end_time,
             skill=skill,  
@@ -642,6 +665,24 @@ def set_day_override():
 
     return render_template('set_day_override.html')
 
+@app.route('/delete_day_override/<int:override_id>', methods=['POST'])
+@login_required
+def delete_day_override(override_id):
+    if current_user.role != 'manager':
+        flash("Access Denied: Only managers can delete day overrides.")
+        return redirect(url_for('home'))
+
+    day_override = DaySpecificOverride.query.get_or_404(override_id)
+    try:
+        db.session.delete(day_override)
+        db.session.commit()
+        flash("Day override deleted successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("An error occurred while deleting the day override.", "error")
+        print(f"Error deleting day override: {e}")
+
+    return redirect(url_for('view_day_overrides'))
 
 
 def fetch_scheduling_data():
@@ -753,7 +794,7 @@ def generate_schedule(works_on_weekends):
         model.Add(
             total_shifts[emp_id] == sum(
                 employee_shifts[(emp_id, day, start_time, end_time)]
-                for (day, start_time, end_time) in employee_shifts
+                for (emp_id, day, start_time, end_time) in employee_shifts
                 if (emp_id, day, start_time, end_time) in employee_shifts
             )
         )
