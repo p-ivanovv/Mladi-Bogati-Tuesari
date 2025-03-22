@@ -132,21 +132,21 @@ def login():
         username = request.form['username']
         user = Users.query.filter_by(username=username).first()
         if user:
-            print(f"User found: {user}")  # Debugging: Print user details
+            print(f"User found: {user}")  
             if check_password_hash(user.password_hash, form.password.data):
                 login_user(user)
                 flash("Login Successful")
                 session['username'] = username
-                print("Login successful, redirecting to dashboard.")  # Debugging
+                print("Login successful, redirecting to dashboard.")  
                 return redirect(url_for('dashboard'))
             else:
                 flash("Wrong Password - Try Again")
-                print("Wrong password.")  # Debugging
+                print("Wrong password.")  
         else:
             flash("User Not Found - Try Again")
-            print("User not found.")  # Debugging
+            print("User not found.")  
     else:
-        print("Form validation failed.")  # Debugging
+        print("Form validation failed.")  
     return render_template('login.html', form=form)
 
 @app.route('/logout', methods=['GET', 'POST'])
@@ -208,7 +208,6 @@ def register():
         role = request.form.get('role')
         skill = request.form.get('skill')
 
-        # Validate form inputs
         if not username or not email or not password or not confirm_password or not role:
             flash("All fields are required!")
             return redirect(url_for('register'))
@@ -217,13 +216,11 @@ def register():
             flash("Passwords do not match!")
             return redirect(url_for('register'))
 
-        # Check if the username or email already exists
         existing_user = Users.query.filter((Users.username == username) | (Users.email == email)).first()
         if existing_user:
             flash("Username or email already exists!")
             return redirect(url_for('register'))
 
-        # Create a new user
         hashed_password = generate_password_hash(password)
         new_user = Users(
             username=username,
@@ -231,7 +228,7 @@ def register():
             password_hash=hashed_password,
             role=role,
             skill=skill,
-            name=username  # Default name to username
+            name=username  
         )
         db.session.add(new_user)
         db.session.commit()
@@ -261,6 +258,7 @@ def set_company_policy():
     return render_template('set_company_policy.html', config=config)
 
 
+
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
@@ -271,16 +269,14 @@ def dashboard():
         company = Company.query.filter_by(manager_id=current_user.id).first()
 
         if request.method == 'POST':
-            # First, check if the manager is trying to create a company
             company_name = request.form.get('company_name')
             if company_name and not company:
                 company = Company(name=company_name, manager_id=current_user.id)
                 db.session.add(company)
                 db.session.commit()
                 flash(f"Company '{company_name}' created successfully!", "success")
-                return redirect(url_for('dashboard'))  # Refresh page
+                return redirect(url_for('dashboard')) 
 
-            # If the manager is assigning an employee to the company
             employee_id = request.form.get('employee_id')
             if employee_id and company:
                 employee = Users.query.get(employee_id)
@@ -638,114 +634,84 @@ def generate_schedule(works_on_weekends):
     day_overrides = DaySpecificOverride.query.all()
     approved_time_offs = TimeOffRequest.query.filter_by(status="Approved").all()
 
-    print("Employees:", [(emp.id, emp.username, emp.skill) for emp in employees])
-    print("Shift Templates:", [(t.day_type, t.start_time, t.end_time, t.skill, t.required_employees) for t in shift_templates])
-    print("Day Overrides:", [(o.day, o.start_time, o.end_time, o.skill, o.required_employees) for o in day_overrides])
-
-    # Calculate the start of the next week (next Monday)
-    today = datetime.now()
-    days_until_next_monday = (7 - today.weekday()) % 7  # Days until the next Monday
-    start_of_week = today + timedelta(days=days_until_next_monday)
-
-    # Map full day names to actual dates
-    day_to_date = {
-        "Monday": start_of_week.date(),
-        "Tuesday": (start_of_week + timedelta(days=1)).date(),
-        "Wednesday": (start_of_week + timedelta(days=2)).date(),
-        "Thursday": (start_of_week + timedelta(days=3)).date(),
-        "Friday": (start_of_week + timedelta(days=4)).date(),
-        "Saturday": (start_of_week + timedelta(days=5)).date(),
-        "Sunday": (start_of_week + timedelta(days=6)).date(),
-    }
-
-    day_name_map = {
-        "Mon": "Monday",
-        "Tue": "Tuesday",
-        "Wed": "Wednesday",
-        "Thu": "Thursday",
-        "Fri": "Friday",
-        "Sat": "Saturday",
-        "Sun": "Sunday",
-    }
-
-    employee_ids = [emp.id for emp in employees]
-    employee_skills = {emp.id: emp.skill for emp in employees}
-
+    # Map employees to their approved time-off periods
     time_off_map = {emp.id: [] for emp in employees}
     for request in approved_time_offs:
         time_off_map[request.user_id].append((request.start_date, request.end_date))
 
+    # Map full day names to actual dates
+    today = datetime.now()
+    start_of_week = today + timedelta(days=(7 - today.weekday()) % 7)
+    day_to_date = {day: start_of_week + timedelta(days=i) for i, day in enumerate(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])}
+
+    # Collect shift requirements
     shifts_needed = {}
     for template in shift_templates:
-        day_range = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] if template.day_type == "Weekday" else ["Saturday", "Sunday"]
-        for day in day_range:
+        applicable_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] if template.day_type == "Weekday" else ["Saturday", "Sunday"]
+        for day in applicable_days:
             if template.day_type == "Weekend" and not works_on_weekends:
                 continue
             key = (day, template.start_time, template.end_time, template.skill)
             shifts_needed[key] = template.required_employees
 
     for override in day_overrides:
-        full_day_name = day_name_map.get(override.day, override.day)
-        key = (full_day_name, override.start_time, override.end_time, override.skill)
+        key = (override.day, override.start_time, override.end_time, override.skill)
         shifts_needed[key] = override.required_employees
 
-    print("Shifts Needed After Overrides:", shifts_needed)
-
+    # Create decision variables for eligible shifts
     employee_shifts = {}
-    for emp_id in employee_ids:
+    for emp in employees:
+        emp_id = emp.id
         for (day, start_time, end_time, skill), required_employees in shifts_needed.items():
-            if employee_skills[emp_id] != skill:
+            if emp.skill != skill:
                 continue
-            if any(start_date <= day_to_date[day] <= end_date for start_date, end_date in time_off_map[emp_id]):
+            if any(start_date <= day_to_date[day].date() <= end_date for start_date, end_date in time_off_map[emp_id]):
                 continue
-            employee_shifts[(emp_id, day, start_time, end_time, skill)] = model.NewBoolVar(
-                f"emp_{emp_id}_{day}_{start_time}_{end_time}_{skill}"
-            )
+            employee_shifts[(emp_id, day, start_time, end_time)] = model.NewBoolVar(f"shift_{emp_id}_{day}_{start_time}_{end_time}")
 
+    # Add staffing constraints
     for (day, start_time, end_time, skill), required_employees in shifts_needed.items():
         eligible_employees = [
-            emp_id for emp_id in employee_ids
-            if (emp_id, day, start_time, end_time, skill) in employee_shifts
+            emp_id for emp_id in [emp.id for emp in employees]
+            if (emp_id, day, start_time, end_time) in employee_shifts
         ]
-        print(f"Eligible employees for {day}, {start_time}-{end_time}, Skill: {skill}: {eligible_employees}")
-        if len(eligible_employees) < required_employees:
-            print(f"Not enough eligible employees for {day}, {start_time}-{end_time}, Skill: {skill}")
-            continue
         model.Add(
-            sum(employee_shifts[(emp_id, day, start_time, end_time, skill)] for emp_id in eligible_employees) >= required_employees
+            sum(employee_shifts[(emp_id, day, start_time, end_time)] for emp_id in eligible_employees) >= required_employees
         )
-        print(f"Added staffing constraint for {day}, {start_time}-{end_time}, Skill: {skill}, Required: {required_employees}")
 
-    total_shifts = {emp_id: model.NewIntVar(0, len(shifts_needed), f"total_shifts_{emp_id}") for emp_id in employee_ids}
-    for emp_id in employee_ids:
+    # Add fairness constraints (e.g., balancing shifts among employees)
+    total_shifts = {emp.id: model.NewIntVar(0, len(shifts_needed), f"total_shifts_{emp.id}") for emp in employees}
+    for emp_id in total_shifts:
         model.Add(
             total_shifts[emp_id] == sum(
-                employee_shifts[(emp_id, day, start_time, end_time, skill)]
-                for (day, start_time, end_time, skill) in shifts_needed
-                if (emp_id, day, start_time, end_time, skill) in employee_shifts
+                employee_shifts[(emp_id, day, start_time, end_time)]
+                for (day, start_time, end_time) in employee_shifts
+                if (emp_id, day, start_time, end_time) in employee_shifts
             )
         )
+
+    # Optimize for fairness
     max_shifts = model.NewIntVar(0, len(shifts_needed), "max_shifts")
     min_shifts = model.NewIntVar(0, len(shifts_needed), "min_shifts")
-    model.AddMaxEquality(max_shifts, [total_shifts[emp_id] for emp_id in employee_ids])
-    model.AddMinEquality(min_shifts, [total_shifts[emp_id] for emp_id in employee_ids])
+    model.AddMaxEquality(max_shifts, list(total_shifts.values()))
+    model.AddMinEquality(min_shifts, list(total_shifts.values()))
     model.Add(max_shifts - min_shifts <= 1)
+    model.Minimize(max_shifts - min_shifts)
 
+    # Solve the model
     solver = cp_model.CpSolver()
     status = solver.Solve(model)
 
     if status in (cp_model.FEASIBLE, cp_model.OPTIMAL):
-        print("Solution Found")
         schedule = {}
-        for emp_id in employee_ids:
-            for (day, start_time, end_time, skill), _ in shifts_needed.items():
-                if (emp_id, day, start_time, end_time, skill) in employee_shifts and solver.Value(employee_shifts[(emp_id, day, start_time, end_time, skill)]) == 1:
-                    date = day_to_date[day]
-                    schedule.setdefault((date, day, start_time, end_time, skill), []).append(emp_id)
+        for (emp_id, day, start_time, end_time) in employee_shifts:
+            if solver.Value(employee_shifts[(emp_id, day, start_time, end_time)]):
+                shift_date = day_to_date[day].date()
+                schedule.setdefault((shift_date, day, start_time, end_time), []).append(emp_id)
         return schedule
     else:
-        print(f"Solver failed with status: {solver.StatusName(status)}")
         return None
+
 
     
 @app.route('/generate_schedule', methods=['GET', 'POST'])
