@@ -55,6 +55,11 @@
                             <td>{{ override.skill }}</td>
                             <td>{{ override.required_employees }}</td>
                         </tr>
+                        <td>
+                            <form action="{{ url_for('delete_day_override', override_id=override.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
                     {% endfor %}
                 </tbody>
             </table>
