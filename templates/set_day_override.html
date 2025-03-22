@@ -6,13 +6,13 @@
     <title>Set Day Override</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
 </head>
-<body>
+<body style="background-color: #080710;"> <!-- Dark background -->
     {% include 'navbar.html' %}
     <div class="override-container">
         <h1>Set Day Override</h1>
         <form class="override-form" method="POST" action="{{ url_for('set_day_override') }}">
             <label for="day">Day:</label>
-            <select name="day" required style="color: rgb(90, 83, 83);">
+            <select name="day" required>
                 <option value="Mon">Monday</option>
                 <option value="Tue">Tuesday</option>
                 <option value="Wed">Wednesday</option>

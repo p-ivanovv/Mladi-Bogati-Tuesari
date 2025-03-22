@@ -5,6 +5,7 @@ body, html {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(to right, #0d131e, #101f49);
     color: #ffffff;
+    overflow-y:scroll;
 }
 
 /* Container for Forms */
