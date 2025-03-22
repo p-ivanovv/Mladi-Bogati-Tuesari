@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="/static/css/style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Shift Templates</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <style>
         table {
             width: 100%;
@@ -29,33 +29,35 @@
 </head>
 <body>
     {% include 'navbar.html' %}
-    <h1>Shift Templates</h1>
+    <div class="container">
+        <h1>Shift Templates</h1>
 
-    {% if shift_templates %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Day Type</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Skill</th> <!-- Changed from 'Role' to 'Skill' -->
-                    <th>Required Employees</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for template in shift_templates %}
+        {% if shift_templates %}
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ template.day_type }}</td>
-                        <td>{{ template.start_time }}</td>
-                        <td>{{ template.end_time }}</td>
-                        <td>{{ template.skill }}</td> <!-- Changed from 'role' to 'skill' -->
-                        <td>{{ template.required_employees }}</td>
+                        <th>Day Type</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Skill</th>
+                        <th>Required Employees</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No shift templates found. Please add a template first.</p>
-    {% endif %}
+                </thead>
+                <tbody>
+                    {% for template in shift_templates %}
+                        <tr>
+                            <td>{{ template.day_type }}</td>
+                            <td>{{ template.start_time }}</td>
+                            <td>{{ template.end_time }}</td>
+                            <td>{{ template.skill }}</td>
+                            <td>{{ template.required_employees }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No shift templates found. Please add a template first.</p>
+        {% endif %}
+    </div>
 </body>
 </html>

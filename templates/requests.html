@@ -1,131 +1,47 @@
-{% extends 'base.html' %}
-{% block content %}
-<style>
-/* Global Styling */
-body, html {
-    height: 100%;
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(to right, #141E30, #243B55);
-    color: #ffffff;
-    text-align: center;
-    overflow-y: scroll;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requests</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/requests.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="container">
+        <h1>Requests</h1>
+        <h2>Time Off Requests</h2>
 
-/* Container for the Page */
-.container {
-    max-width: 800px;
-    margin: 50px auto;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Header */
-h2 {
-    color: #f1c40f;
-    text-transform: uppercase;
-}
-
-/* Table Styling */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-th, td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-th {
-    background: rgba(255, 255, 255, 0.2);
-    color: #f1c40f;
-    text-transform: uppercase;
-}
-
-/* Alternate Row Coloring */
-tr:nth-child(even) {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-/* Button Styling */
-button {
-    padding: 8px 12px;
-    background: #f1c40f;
-    color: #080710;
-    font-size: 14px;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: 0.3s;
-    margin: 5px;
-}
-
-button:hover {
-    background: #d4ac0d;
-    transform: scale(1.05);
-}
-
-/* Status Colors */
-td.approved {
-    color: #27ae60;
-    font-weight: bold;
-}
-
-td.rejected {
-    color: #e74c3c;
-    font-weight: bold;
-}
-
-td.pending {
-    color: #f1c40f;
-    font-weight: bold;
-}
-</style>
-
-<div class="container">
-    <h2>Time Off Requests</h2>
-
-    <table>
-        <tr>
-            <th>Employee</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Reason</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-        {% for request in requests %}
-        <tr>
-            <td>{{ request.user.name }}</td>
-            <td>{{ request.start_date }}</td>
-            <td>{{ request.end_date }}</td>
-            <td>{{ request.reason }}</td>
-            <td class="{{ request.status|lower }}">{{ request.status }}</td>
-            <td>
-                {% if request.status == 'Pending' %}
-                <form method="POST" action="{{ url_for('view_time_off_request') }}">
-                    <input type="hidden" name="request_id" value="{{ request.id }}">
-                    <button type="submit" name="action" value="approve">Approve</button>
-                    <button type="submit" name="action" value="reject">Reject</button>
-                </form>
-                {% else %}
-                {{ request.status }}
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-
-{% endblock %}
+        <table>
+            <tr>
+                <th>Employee</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            {% for request in requests %}
+            <tr>
+                <td>{{ request.user.name }}</td>
+                <td>{{ request.start_date }}</td>
+                <td>{{ request.end_date }}</td>
+                <td>{{ request.reason }}</td>
+                <td class="{{ request.status|lower }}">{{ request.status }}</td>
+                <td>
+                    {% if request.status == 'Pending' %}
+                    <form method="POST" action="{{ url_for('view_time_off_request') }}">
+                        <input type="hidden" name="request_id" value="{{ request.id }}">
+                        <button type="submit" name="action" value="approve">Approve</button>
+                        <button type="submit" name="action" value="reject">Reject</button>
+                    </form>
+                    {% else %}
+                    {{ request.status }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

@@ -5,11 +5,11 @@ body, html {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(to right, #0d131e, #101f49);
     color: #ffffff;
-    overflow-y:scroll;
+    overflow-y: scroll;
 }
 
 /* Container for Forms */
-.container {
+.container, .override-container {
     position: relative;
     max-width: 600px;
     margin: 50px auto;
@@ -28,7 +28,7 @@ body, html {
     align-items: center;
     margin: 20px 50px;
     gap: 15px;
-    margin-left: 320px
+    margin-left: 320px;
 }
 
 .header-container h2 {
@@ -40,7 +40,7 @@ body, html {
 }
 
 /* Form Styling */
-form {
+form, .override-form {
     display: flex;
     flex-direction: column;
 }
@@ -48,6 +48,7 @@ form {
 label {
     font-weight: bold;
     margin-bottom: 5px;
+    color: #ffffff;
 }
 
 input, select {
@@ -62,10 +63,6 @@ input, select {
 
 input::placeholder, select {
     color: #cccccc;
-}
-
-.calendar-container {
-    margin-left: 320px !important;
 }
 
 /* Button Styling */
@@ -125,7 +122,6 @@ button:hover, .btn:hover {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
-
 }
 
 /* Weekday Header */
@@ -160,56 +156,3 @@ button:hover, .btn:hover {
     font-size: 14px;
     transition: 0.3s;
 }
-
-.override-container {
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.8); /* Dark background */
-    box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.override-container h1 {
-    text-align: center;
-    font-family: 'Poppins', sans-serif;
-    color: #ffffff;
-}
-
-.override-form {
-    display: flex;
-    flex-direction: column;
-}
-
-.override-form label {
-    margin-bottom: 10px;
-    font-weight: bold;
-    color: #ffffff;
-}
-
-.override-form input,
-.override-form select {
-    margin-bottom: 20px;
-    padding: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-}
-
-.override-form button {
-    padding: 10px;
-    background-color: #ffffff;
-    color: #080710;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.override-form button:hover {
-    background-color: #D0B8A8;
-}
-

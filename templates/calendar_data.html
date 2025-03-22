@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Shift Calendar</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar_data.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shift_management.css') }}">
     <script>
         function openRequestForm(date) {
             document.getElementById('requestForm').style.display = 'block';
@@ -24,7 +24,7 @@
       </style>
 </head>
 <body>
-    {% include 'navbar.html' %}
+
     <div class="container">
         <h1>Your Shift Calendar</h1>
         <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Go Home</a>

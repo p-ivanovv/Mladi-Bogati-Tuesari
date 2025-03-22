@@ -67,13 +67,13 @@
           </a>
         </li>
         {% endif %}
-        {% if request.endpoint != 'calendar_data' %}
+        {% if request.endpoint != 'requests' %}
         <li class="navbar-item flexbox-left">
-          <a class="navbar-item-inner flexbox-left" href="{{ url_for('calendar_data') }}">
+          <a class="navbar-item-inner flexbox-left" href="{{ url_for('requests') }}">
             <div class="navbar-item-inner-icon-wrapper flexbox">
-              <ion-icon name="calendar-outline" style="color: #1845ad;"></ion-icon>
+              <ion-icon name="paper-plane-outline" style="color: #ff512f;"></ion-icon>
             </div>
-            <span class="link-text" style="color: #1845ad;">Calendar</span>
+            <span class="link-text" style="color: #ff512f;">Requests</span>
           </a>
         </li>
         {% endif %}
@@ -89,16 +89,6 @@
           </a>
         </li>
         {% endif %}
-        {% if request.endpoint != 'dashboard' %}
-        <li class="navbar-item flexbox-left">
-          <a class="navbar-item-inner flexbox-left" href="{{ url_for('dashboard') }}">
-            <div class="navbar-item-inner-icon-wrapper flexbox">
-              <ion-icon name="pie-chart-outline" style="color: #ff512f;"></ion-icon>
-            </div>
-            <span class="link-text" style="color: #ff512f;">Dashboard</span>
-          </a>
-        </li>
-        {% endif %}
         {% if request.endpoint != 'requests_employee' %}
         <li class="navbar-item flexbox-left">
           <a class="navbar-item-inner flexbox-left" href="{{ url_for('requests_employee') }}">
@@ -109,6 +99,16 @@
           </a>
         </li>
         {% endif %}
+      {% endif %}
+      {% if request.endpoint != 'dashboard' %}
+      <li class="navbar-item flexbox-left">
+        <a class="navbar-item-inner flexbox-left" href="{{ url_for('dashboard') }}">
+          <div class="navbar-item-inner-icon-wrapper flexbox">
+            <ion-icon name="pie-chart-outline" style="color: #ff512f;"></ion-icon>
+          </div>
+          <span class="link-text" style="color: #ff512f;">Dashboard</span>
+        </a>
+      </li>
       {% endif %}
     {% endif %}
   </ul>
