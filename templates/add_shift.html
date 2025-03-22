@@ -5,25 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shift Manager</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/add_shift.css') }}">
-    <style>
-        body{
-            overflow-y: scroll;
-        }
-        .modal-content {
-            padding: 20px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-    </style>
 </head>
-<body style="background-color: white;">
+<body>
     {% include 'navbar.html' %}
     <div class="header-container">
         <h2>Shift Calendar</h2>
-        <button id="openModal" class="btn btn-primary">Add Shift</button>
-        <a href="{{ url_for('dashboard') }}"><button>Go Home</button></a>
+        <button id="openModal" class="btn btn-primary">Add Shift</button>    
+        <a href="{{ url_for('generate_schedule_route') }}" class="btn btn-primary">Use the MODERN way</a>
     </div>
-    
     <div id="shiftModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -58,11 +47,17 @@
         </div>
     </div>
 
-    <div class="calendar-container">
+    <div class="calendar-container" style="width: 100%; height: 100vh; margin: 0 auto;">
         {% include 'calendar.html' %}
     </div>
-    <div class="container">
-        <a href="{{url_for('generate_schedule_route')}}"class="btn btn-primary">Use the MODERN way</a>
+
+    <div id="eventModal" class="event-modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="eventModalTitle">Event Details</h2>
+            <p id="eventDetails"></p>
+        </div>
+    </div>
 
     <script>
         var modal = document.getElementById("shiftModal");
@@ -75,6 +70,10 @@
         var userSelect = document.getElementById("user_id");
         var modalTitle = document.getElementById("modalTitle");
         var deleteButton = document.getElementById("deleteButton");
+
+        var eventModal = document.getElementById("eventModal");
+        var eventSpan = eventModal.getElementsByClassName("close")[0];
+        var eventDetails = document.getElementById("eventDetails");
 
         btn.onclick = function() {
             modal.style.display = "block";
@@ -91,14 +90,22 @@
             modal.style.display = "none";
         };
 
+        eventSpan.onclick = function() {
+            eventModal.style.display = "none";
+        };
+
         window.onclick = function(event) {
             if (event.target == modal) {
                 modal.style.display = "none";
             }
+            if (event.target == eventModal) {
+                eventModal.style.display = "none";
+            }
         };
 
         document.querySelectorAll(".shift").forEach(shift => {
-            shift.addEventListener("click", function() {
+            shift.addEventListener("click", function(e) {
+                e.stopPropagation();
                 modal.style.display = "block";
                 modalTitle.innerText = "Edit Shift";
                 shiftIdInput.value = this.getAttribute("data-id");
@@ -110,13 +117,35 @@
                 if (deleteButton) {
                     deleteButton.style.display = "inline-block";
                     document.getElementById("deleteShiftForm").action = `/shift/delete/${shiftIdInput.value}`;
-                    deleteButton.onclick = function(event) {
-                        event.preventDefault();
-                        if (confirm("Are you sure you want to delete this shift?")) {
-                            document.getElementById("deleteShiftForm").submit();
-                        }
-                    };
                 }
+            });
+        });
+
+        document.querySelectorAll(".shift").forEach(shift => {
+            if (shift.getAttribute("data-taken") === "true") {
+                shift.classList.add("taken-shift");
+            }
+        });
+
+        document.querySelectorAll(".event-button").forEach(button => {
+            button.addEventListener("click", function() {
+                eventModal.style.display = "block";
+                eventDetails.innerText = this.getAttribute("data-details");
+            });
+        });
+
+        // Add event button functionality
+        document.querySelectorAll(".event-button").forEach(button => {
+            button.addEventListener("click", function(e) {
+                e.stopPropagation();
+                const date = this.getAttribute("data-date");
+                modal.style.display = "block";
+                modalTitle.innerText = "Add Event";
+                dateInput.value = date;
+                startTimeInput.value = "";
+                endTimeInput.value = "";
+                userSelect.value = "";
+                deleteButton.style.display = "none";
             });
         });
     </script>

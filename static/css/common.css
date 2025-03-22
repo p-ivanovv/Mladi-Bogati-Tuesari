@@ -4,7 +4,7 @@ body, html {
     margin: 0;
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(to right, #0d131e, #101f49);
-    color: #ffffff;
+    color: #1d1b1b;
     overflow-y: scroll;
 }
 

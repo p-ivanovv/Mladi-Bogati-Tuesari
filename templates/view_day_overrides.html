@@ -6,6 +6,11 @@
     <title>View Day Overrides</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <style>
+        body {
+            background-color: #000000; /* Black background */
+            color: #ffffff;
+            overflow-y: scroll;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -17,10 +22,11 @@
             text-align: left;
         }
         th {
-            background-color: #f4f4f4;
+            background-color: #333333; /* Darker background */
+            color: #ffffff;
         }
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #444444; /* Darker background */
         }
     </style>
 </head>

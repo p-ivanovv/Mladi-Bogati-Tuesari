@@ -28,7 +28,7 @@ body, html {
     align-items: center;
     margin: 20px 50px;
     gap: 15px;
-    margin-left: 320px
+    margin-left: 50px;  /* Changed from 320px */
 }
 
 .header-container h2 {
@@ -53,25 +53,31 @@ label {
 input, select {
     padding: 10px;
     margin-bottom: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 5px;
-    background: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.9);
+    color: #000000;
     font-size: 14px;
 }
 
 input::placeholder, select {
-    color: #cccccc;
+    color: #666666;
 }
 
 .calendar-container {
-    margin-left: 320px !important;
+    margin-left: 175px !important;  /* Changed from 320px */
+    max-width: 1200px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Button Styling */
 button, .btn {
     padding: 10px 15px;
-    background: #f1c40f;
+    background: #EDE8D0;
     color: #080710;
     font-size: 16px;
     font-weight: bold;
@@ -100,65 +106,97 @@ button:hover, .btn:hover {
 }
 
 .modal-content {
-    background: rgba(255, 255, 255, 0.15);
-    margin: 10% auto;
+    background: rgba(20, 20, 20, 0.95);
+    margin: 5% auto;
     padding: 20px;
     width: 40%;
+    max-height: 90vh;
+    overflow-y: auto;
     border-radius: 10px;
     text-align: center;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+}
+
+.modal-content h2 {
+    color: #cbcac8;
+}
+
+.modal-content label {
+    color: #ffffff;
+}
+
+.modal-content input,
+.modal-content select {
+    background: rgba(50, 50, 50, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.modal-content input::placeholder {
+    color: #999999;
 }
 
 .close {
     float: right;
     font-size: 28px;
     cursor: pointer;
-    color: #ffffff;
+    color: #ff0000;
 }
 
-/* Calendar Container */
-.calendar-container {
-    max-width: 900px;
-    margin-left: 200px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
 
-}
-
-/* Weekday Header */
-.weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    font-weight: bold;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 10px;
-    border-radius: 5px;
-    color: #f1c40f;
-}
 
 /* Calendar Grid */
 .calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
+    gap: 10px;
     padding: 10px;
 }
 
 /* Individual Day Box */
 .day {
     border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 15px;
-    min-height: 120px;
+    padding: 20px; /* Increase padding for larger day boxes */
+    min-height: 150px; /* Increase minimum height for day boxes */
     border-radius: 5px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(224, 221, 221, 0.393);
     text-align: left;
     color: white;
-    font-size: 14px;
+    font-size: 16px; /* Increase font size */
     transition: 0.3s;
+    position: relative; /* Add position relative for event buttons */
+}
+
+
+/* Event Modal */
+.event-modal {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    background: rgba(255, 255, 255, 0.9);
+    color: #080710;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+.event-modal.active {
+    display: block;
+}
+
+.event-modal .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #080710;
 }
 
 .override-container {
@@ -211,5 +249,20 @@ button:hover, .btn:hover {
 
 .override-form button:hover {
     background-color: #D0B8A8;
+}
+
+.shift {
+    padding: 10px;
+    margin: 5px 0;
+    background: #EDE8D0;
+    color: #080710;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.shift:hover {
+    background: #d4ac0d;
+    transform: scale(1.02);
 }
 
