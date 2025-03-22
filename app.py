@@ -414,9 +414,9 @@ def add_shift():
     if current_user.role != 'manager':
         flash("Access Denied: Only managers can add shifts.")
         return redirect(url_for('home'))
-    
+
     company = Company.query.filter_by(manager_id=current_user.id).first()
-    
+
     if not company:
         flash("You need to create a company first!", "warning")
         return redirect(url_for('dashboard'))
@@ -448,6 +448,13 @@ def add_shift():
             flash("This employee is not part of your company!", "danger")
             return redirect(url_for('add_shift'))
 
+        # Check for approved time-off requests
+        time_off_requests = TimeOffRequest.query.filter_by(user_id=user_id, status='Approved').all()
+        for request_obj in time_off_requests:
+            if request_obj.start_date <= datetime.strptime(date, '%Y-%m-%d').date() <= request_obj.end_date:
+                flash("This employee has an approved time-off request during this time!")
+                return redirect(url_for('add_shift'))
+
         # Prevent shift overlaps
         overlapping_shifts = Shifts.query.filter(
             Shifts.user_id == user_id,
@@ -457,30 +464,34 @@ def add_shift():
                 db.and_(Shifts.start_time < end_time, Shifts.end_time >= end_time),
                 db.and_(Shifts.start_time >= start_time, Shifts.end_time <= end_time)
             )
-        ).all()
+        ).filter(Shifts.id != shift_id).all()  # Exclude the current shift being edited
 
         if overlapping_shifts:
             flash("Shift overlaps with an existing shift for this employee.")
             return redirect(url_for('add_shift'))
 
-        # Create or update the shift
-        if shift_id:
-            old_shift = Shifts.query.get(shift_id)
-            if old_shift:
-                db.session.delete(old_shift)
-                db.session.commit()
+        # Update or create the shift
+        if shift_id:  # Editing an existing shift
+            shift = Shifts.query.get(shift_id)
+            if shift:
+                shift.date = date
+                shift.start_time = start_time
+                shift.end_time = end_time
+                shift.user_id = user_id
+                shift.day = day
+                shift.skill = user.skill
+        else:  # Creating a new shift
+            shift = Shifts(
+                date=date,
+                start_time=start_time,
+                end_time=end_time,
+                user_id=user_id,
+                day=day,
+                skill=user.skill
+            )
+            db.session.add(shift)
 
-        new_shift = Shifts(
-            date=date, 
-            start_time=start_time, 
-            end_time=end_time, 
-            user_id=user_id, 
-            day=day, 
-            skill=user.skill
-        )
-        db.session.add(new_shift)
         db.session.commit()
-
         flash("Shift updated successfully!" if shift_id else "Shift added successfully!")
         return redirect(url_for('add_shift'))
 
@@ -490,8 +501,9 @@ def add_shift():
 
     today = datetime.now()
     calendar_days = [today + timedelta(days=i) for i in range(7)]
-    
+
     return render_template('add_shift.html', employees=employees, shifts=shifts, calendar_days=calendar_days)
+
 
 
 @app.route('/shift/delete/<int:shift_id>', methods=['POST'])
@@ -665,6 +677,7 @@ def generate_schedule(works_on_weekends):
         for (day, start_time, end_time, skill), required_employees in shifts_needed.items():
             if emp.skill != skill:
                 continue
+            # Exclude employees with approved time-off requests
             if any(start_date <= day_to_date[day].date() <= end_date for start_date, end_date in time_off_map[emp_id]):
                 continue
             employee_shifts[(emp_id, day, start_time, end_time)] = model.NewBoolVar(f"shift_{emp_id}_{day}_{start_time}_{end_time}")
