@@ -10,7 +10,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: calc(100vh - 60px); /* Adjust height based on navbar height */
+            height: calc(100vh - 60px);
         }
         .form-container form {
             display: flex;
@@ -19,14 +19,17 @@
             width: 100%;
             max-width: 400px;
         }
-        .form-container label, .form-container input, .form-container button {
+        .form-container label,
+        .form-container input,
+        .form-container select,
+        .form-container button {
             width: 100%;
             margin-bottom: 15px;
-            font-size: 16px; /* Increase text size */
+            font-size: 16px;
         }
         .form-container h1 {
-            font-size: 26px; /* Slightly larger font size for the title */
-            margin-bottom: 20px; /* Add some space below the title */
+            font-size: 26px;
+            margin-bottom: 20px;
         }
         body {
             overflow-y: scroll;
@@ -37,12 +40,26 @@
     {% include 'navbar.html' %}
     <div class="form-container">
         <form method="POST" action="{{ url_for('set_shift_template') }}">
-            <h1>Template Name</h1>
-            <input type="text" id="template_name" name="template_name" required>
+            <h1>Set Shift Template</h1>
+
+            <label for="day_type">Day Type:</label>
+            <select id="day_type" name="day_type" required>
+                <option value="Weekday">Weekday</option>
+                <option value="Weekend">Weekend</option>
+            </select>
+
             <label for="start_time">Start Time:</label>
             <input type="time" id="start_time" name="start_time" required>
+
             <label for="end_time">End Time:</label>
             <input type="time" id="end_time" name="end_time" required>
+
+            <label for="skill">Skill Required:</label>
+            <input type="text" id="skill" name="skill" required>
+
+            <label for="required_employees">Required Employees:</label>
+            <input type="number" id="required_employees" name="required_employees" min="1" required>
+
             <button type="submit">Save Template</button>
         </form>
     </div>
