@@ -11,7 +11,9 @@
     <div class="header-container">
         <h2>Shift Calendar</h2>
         <button id="openModal" class="btn btn-primary">Add Shift</button>    
-        <a href="{{ url_for('generate_schedule_route') }}" class="btn btn-primary">Kalendarcho</a>
+        <a href="{{ url_for('generate_schedule_route') }}">
+            <img src="{{ url_for('static', filename='images/kalendarcho.png') }}" alt="Kalendarcho" style="height: 100px; width: 100px; cursor: pointer; background-color: inherit; border-radius: 15px; object-fit: cover;">
+        </a>
     </div>
     <div id="shiftModal" class="modal">
         <div class="modal-content">
