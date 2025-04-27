@@ -6,32 +6,49 @@
     <title>View Shift Templates</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <style>
+        body {
+            background-color: #080710;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: white; /* Ensure header text is white */
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin: 20px auto;
+            background-color: white; /* Ensure table background is always white */
+            color: black; /* Set text color to black for readability */
+            border-radius: 5px;
+            overflow: hidden;
         }
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             text-align: left;
+            border: 1px solid #ddd;
         }
         th {
-            background-color: #f4f4f4;
-            
+            background-color: #4CAF50; /* Header background color */
+            color: white; /* Header text color */
         }
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: white; /* Ensure even rows have white background */
         }
-        body{
-            overflow-y: scroll;
+        tr:nth-child(odd) {
+            background-color: white; /* Ensure odd rows also have white background */
+        }
+        tr:hover {
+            background-color: #f1f1f1; /* Highlight row on hover */
         }
     </style>
 </head>
 <body>
     {% include 'navbar.html' %}
     <div class="container">
-        <h1>Shift Templates </h1>
+        <h1>Shift Templates</h1>
 
         {% if shift_templates %}
             <table>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Schedule</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <style>
+        body {
+            background-color: #080710;
+            color: white;
+        }
+        .schedule-container {
+            margin: 20px auto;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+        .shift {
+            background-color: white;
+            color: black;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="schedule-container">
+        <h1>View Schedule</h1>
+        {% for shift in shifts %}
+            <div class="shift">
+                <p><strong>Date:</strong> {{ shift.date }}</p>
+                <p><strong>Start Time:</strong> {{ shift.start_time }}</p>
+                <p><strong>End Time:</strong> {{ shift.end_time }}</p>
+                <p><strong>User:</strong> {{ shift.user.name if shift.user else 'Unassigned' }}</p>
+                <p><strong>Skill:</strong> {{ shift.skill }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

@@ -108,6 +108,75 @@
         padding: 15px;
         border-radius: 5px;
     }
+
+    /* Table Styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px auto;
+        background-color: white; /* Ensure table background is always white */
+        color: black; /* Set text color to black for readability */
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    th {
+        background-color: #06666a; /* Header background color */
+        color: white; /* Header text color */
+    }
+    td {
+        background-color: #e3f2fd; /* Light blue background for table cells */
+        color: black; /* Text color for table cells */
+    }
+    tr:nth-child(even) td {
+        background-color: #e3f2fd; /* Ensure even rows have light blue background */
+    }
+    tr:nth-child(odd) td {
+        background-color: #e3f2fd; /* Ensure odd rows also have light blue background */
+    }
+    tr:hover td {
+        background-color: #bbdefb; /* Slightly darker blue on hover */
+    }
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+    tr {
+        cursor: default; /* Default cursor for rows */
+        transition: background-color 0.3s ease;
+    }
+
+    /* Table Styling for Available Employees */
+    table.available-employees {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px auto;
+        background-color: white; /* Ensure table background is always white */
+        color: black; /* Set text color to black for readability */
+        border-radius: 5px;
+        overflow: hidden;
+        font-size: 14px; /* Smaller font size for compact design */
+    }
+    table.available-employees th {
+        background-color: #06666a; /* Header background color */
+        color: white; /* Header text color */
+        padding: 8px; /* Smaller padding */
+    }
+    table.available-employees td {
+        background-color: #e3f2fd; /* Light blue background for table cells */
+        color: black; /* Text color for table cells */
+        border: 1px solid black; /* Black outline for table cells */
+        padding: 5px; /* Smaller padding */
+    }
+    table.available-employees tr:nth-child(even) td {
+        background-color: #e3f2fd; /* Ensure even rows have light blue background */
+    }
+    table.available-employees tr:nth-child(odd) td {
+        background-color: #e3f2fd; /* Ensure odd rows also have light blue background */
+    }
+    table.available-employees tr:hover td {
+        background-color: #bbdefb; /* Slightly darker blue on hover */
+    }
 </style>
 
 <div class="container animate__animated animate__fadeIn">
@@ -186,31 +255,68 @@
                 </div>
                 <div class="card-body">
                     {% if company.employees %}
-                        <ul class="list-group">
-                            {% for employee in company.employees %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    {{ employee.name }} ({{ employee.email }})
-                                    <span class="badge bg-primary">{{ employee.skill or "No Skill Assigned" }}</span>
-                                    <div>
-                                        <!-- Set Skill -->
-                                        <form action="{{ url_for('set_skill', employee_id=employee.id) }}" method="POST" style="display: inline;">
-                                            <input type="text" name="skill" placeholder="Set Skill" class="form-control d-inline w-auto" required>
-                                            <button type="submit" class="btn btn-primary btn-sm">Set Skill</button>
-                                        </form>
-                                        <!-- Remove Employee -->
-                                        <form action="{{ url_for('remove_employee', employee_id=employee.id) }}" method="POST" style="display: inline;">
-                                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                                        </form>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Employee Name</th>
+                                    <th>Email</th>
+                                    <th>Skill</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for employee in company.employees %}
+                                    <tr>
+                                        <td>{{ employee.name }}</td>
+                                        <td>{{ employee.email }}</td>
+                                        <td>{{ employee.skill or "No Skill Assigned" }}</td>
+                                        <td>
+                                            <form action="{{ url_for('set_skill', employee_id=employee.id) }}" method="POST" style="display: inline;">
+                                                <input type="text" name="skill" placeholder="Set Skill" class="form-control d-inline w-auto" required>
+                                                <button type="submit" class="btn btn-primary btn-sm">Set Skill</button>
+                                            </form>
+                                            <form action="{{ url_for('remove_employee', employee_id=employee.id) }}" method="POST" style="display: inline;">
+                                                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     {% else %}
                         <p class="text-muted text-center">No employees assigned yet.</p>
                     {% endif %}
                 </div>
             </div>
         {% endif %}
+    {% endif %}
+
+    {% if employees %}
+        <h3 class="mt-4 text-center text-primary">Available Employees</h3>
+        <table class="available-employees">
+            <thead>
+                <tr>
+                    <th>Employee Name</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in employees %}
+                    <tr>
+                        <td>{{ employee.name }}</td>
+                        <td>{{ employee.email }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('assign_employee', employee_id=employee.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-success btn-sm">Assign</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-muted text-center">No available employees to assign.</p>
     {% endif %}
 </div>
 

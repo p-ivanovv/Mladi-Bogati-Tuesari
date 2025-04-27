@@ -3,44 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Requests</title>
+    <title>Manage Requests</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/requests.css') }}">
+    <style>
+        body {
+            background-color: #080710;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: white; /* Ensure header text is white */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            background-color: white; /* Ensure table background is always white */
+            color: black; /* Set text color to black for readability */
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        th {
+            background-color: #06666a; /* Header background color */
+            color: white; /* Header text color */
+        }
+        td {
+            background-color: #e3f2fd; /* Light blue background for table cells */
+            color: black; /* Text color for table cells */
+        }
+        tr:nth-child(even) td {
+            background-color: #e3f2fd; /* Ensure even rows have light blue background */
+        }
+        tr:nth-child(odd) td {
+            background-color: #e3f2fd; /* Ensure odd rows also have light blue background */
+        }
+        tr:hover td {
+            background-color: #bbdefb; /* Slightly darker blue on hover */
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        .btn {
+            padding: 5px 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            text-transform: uppercase;
+            width: 100px; /* Ensure buttons have the same width */
+        }
+        .btn-approve {
+            background-color: #4CAF50; /* Green for Approve */
+            color: white;
+        }
+        .btn-approve:hover {
+            background-color: #45a049;
+        }
+        .btn-reject {
+            background-color: #f44336; /* Red for Reject */
+            color: white;
+        }
+        .btn-reject:hover {
+            background-color: #d32f2f;
+        }
+    </style>
 </head>
 <body>
     {% include 'navbar.html' %}
     <div class="container">
-        <h1>Requests</h1>
-        <h2>Time Off Requests</h2>
-
+        <h1>Manage Time Off Requests</h1>
         <table>
-            <tr>
-                <th>Employee</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Reason</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-            {% for request in requests %}
-            <tr>
-                <td>{{ request.user.name }}</td>
-                <td>{{ request.start_date }}</td>
-                <td>{{ request.end_date }}</td>
-                <td>{{ request.reason }}</td>
-                <td class="{{ request.status|lower }}">{{ request.status }}</td>
-                <td>
-                    {% if request.status == 'Pending' %}
-                    <form method="POST" action="{{ url_for('view_time_off_request') }}">
-                        <input type="hidden" name="request_id" value="{{ request.id }}">
-                        <button type="submit" name="action" value="approve">Approve</button>
-                        <button type="submit" name="action" value="reject">Reject</button>
-                    </form>
-                    {% else %}
-                    {{ request.status }}
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in requests %}
+                    <tr>
+                        <td>{{ request.user.name }}</td>
+                        <td>{{ request.start_date }}</td>
+                        <td>{{ request.end_date }}</td>
+                        <td>{{ request.reason }}</td>
+                        <td>{{ request.status }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('view_time_off_request') }}" style="display: inline;">
+                                <input type="hidden" name="request_id" value="{{ request.id }}">
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="btn btn-approve">Approve</button>
+                            </form>
+                            <form method="POST" action="{{ url_for('view_time_off_request') }}" style="display: inline;">
+                                <input type="hidden" name="request_id" value="{{ request.id }}">
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="btn btn-reject">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
 </body>
