@@ -451,11 +451,16 @@ def calendar_data():
     else:
         shifts = Shifts.query.filter_by(user_id=current_user.id).all()
 
-    for shift in shifts:
-        shift.date = shift.date  
+    # Determine the date range for the calendar
+    if shifts:
+        earliest_date = min(datetime.strptime(shift.date, '%Y-%m-%d') for shift in shifts)
+        latest_date = max(datetime.strptime(shift.date, '%Y-%m-%d') for shift in shifts)
+    else:
+        today = datetime.now()
+        earliest_date = today
+        latest_date = today + timedelta(days=7)
 
-    today = datetime.now()
-    calendar_days = [today + timedelta(days=i) for i in range(7)] 
+    calendar_days = [earliest_date + timedelta(days=i) for i in range((latest_date - earliest_date).days + 1)]
     return render_template('calendar_data.html', shifts=shifts, calendar_days=calendar_days)
 
 @app.route('/shift/add', methods=['GET', 'POST'])
@@ -746,7 +751,8 @@ def generate_schedule(works_on_weekends):
         time_off_map[request.user_id].append((request.start_date, request.end_date))
 
     today = datetime.now()
-    start_of_week = today - timedelta(days=today.weekday())  
+    # Adjust start_of_week to always point to the upcoming Monday
+    start_of_week = today + timedelta(days=(7 - today.weekday())) if today.weekday() != 0 else today
     day_to_date = {
         "Monday": start_of_week + timedelta(days=0),
         "Tuesday": start_of_week + timedelta(days=1),
